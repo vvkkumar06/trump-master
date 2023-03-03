@@ -4,5 +4,11 @@ export const CricketPlayerDisplayProps = {
   'StrikeRate': 'STR',
   'BattingAverage': 'AVG',
   'HighestScore': 'HS',
-  'Sixes': 'SIX'
+  'Sixes': 'SIX',
+  'BBIW': 'BST',
+  'BowlingAverage': 'BAVG',
+  'EconomyRate': 'ECO',
+  'DotBallsBowled': 'DOT',
+  'Wickets': 'WKT',
+  'OversBowled': 'OVR'
 }

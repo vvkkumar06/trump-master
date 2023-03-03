@@ -3,8 +3,10 @@ import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native';
 import PlayerComponent from '../../../components/PlayerComponent';
 import { CricketPlayerDisplayProps } from '../../../utils/display-properties';
+// import { getPlayerProfileImage } from '../../../utils/player-images';
 import dummyData from './../../../../data/players';
 
+let cricData = [...Object.values(dummyData)];
 const generateColor = () => {
   const randomColor = Math.floor(Math.random() * 16777215)
     .toString(16)
@@ -17,13 +19,17 @@ const PlayersView = (props) => {
   return( 
     <SafeAreaView style={styles.container}>
        <FlatList 
-        data={dummyData}
+        data={cricData}
         numColumns={2}
         columnWrapperStyle={{justifyContent: 'space-between'}}
         ItemSeparatorComponent={() => <View style={{height: 10}} />}
         renderItem={({item}) => {
           return <View>  
-            <PlayerComponent displayProps = {CricketPlayerDisplayProps} playerData={item} coverColor={generateColor()} />
+            <PlayerComponent 
+            displayProps = {CricketPlayerDisplayProps} 
+            playerData={item} 
+            // playerImage ={getPlayerProfileImage(item.StrikerName)}
+            coverColor={generateColor()} />
           </View>
         }}
         keyExtractor={item => item.StrikerName}

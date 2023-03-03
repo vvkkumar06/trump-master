@@ -5,7 +5,7 @@ import { View } from 'react-native';
 
 const PlayerComponent = ({displayProps, playerData, coverColor}) => (
   <Card elevated key={playerData.StrikerName} style={styles.container} >
-    <Card.Cover source={{ uri: `https://scores.iplt20.com/ipl/playerimages/${playerData.StrikerName}.png`}} style={{...styles.image, backgroundColor: coverColor}} resizeMode='contain' />
+    <Card.Cover source={{ uri: `https://scores.iplt20.com/ipl/playerimages/${playerData.StrikerName}.png`}} style={{...styles.image, backgroundColor: coverColor, borderRadius: 0}} resizeMode='contain' />
     <Text style={{ 
     textAlign: 'center', textTransform: 'uppercase', fontWeight: 900,
     backgroundColor: '#333', color: '#eee', fontStyle: 'italic'
@@ -26,9 +26,9 @@ const PlayerComponent = ({displayProps, playerData, coverColor}) => (
               color: '#eee'
               }}> {displayProps[key]} </Text>
             <Text variant="labelSmall" style={{
-              textAlign: 'right', fontSize: 8,
+              textAlign: 'center', fontSize: 10,
               width: '50%', borderWidth: 1, borderColor: '#ccc'
-            }} >{playerData[key]} </Text>
+            }} >{playerData[key] ? playerData[key] : '-'} </Text>
           </View>)
         }) : []
       }
@@ -40,7 +40,8 @@ const PlayerComponent = ({displayProps, playerData, coverColor}) => (
 const styles = StyleSheet.create({
   container: {
     width: 170,
-    height: 280
+    height: 270,
+    borderRadius: 0
   },
   image: {
     height: 120,
