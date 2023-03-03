@@ -1,0 +1,55 @@
+import * as React from 'react';
+import { StyleSheet } from 'react-native';
+import {Card, Text } from 'react-native-paper';
+import { View } from 'react-native';
+
+const PlayerComponent = ({displayProps, playerData, coverColor}) => (
+  <Card elevated key={playerData.StrikerName} style={styles.container} >
+    <Card.Cover source={{ uri: `https://scores.iplt20.com/ipl/playerimages/${playerData.StrikerName}.png`}} style={{...styles.image, backgroundColor: coverColor}} resizeMode='contain' />
+    <Text style={{ 
+    textAlign: 'center', textTransform: 'uppercase', fontWeight: 900,
+    backgroundColor: '#333', color: '#eee', fontStyle: 'italic'
+    }}>{playerData.StrikerName}</Text>
+    <View style={{justifyContent: 'space-between', flexDirection: 'row', 
+    padding: 0,flexWrap: 'wrap'}}>
+      {     
+        displayProps ? Object.keys(displayProps).map( key => {
+          
+          return (
+          <View style={{
+            justifyContent: 'space-between', width: '50%', 
+            flexDirection: 'row', marginBottom: 2, borderWidth: 1, borderColor: '#666'
+            }} key={key}>
+            <Text variant="labelSmall" style={{
+              width: '50%',fontWeight: 900, 
+              backgroundColor: '#333',
+              color: '#eee'
+              }}> {displayProps[key]} </Text>
+            <Text variant="labelSmall" style={{
+              textAlign: 'right', fontSize: 8,
+              width: '50%', borderWidth: 1, borderColor: '#ccc'
+            }} >{playerData[key]} </Text>
+          </View>)
+        }) : []
+      }
+      
+    </View>
+  </Card>
+);
+
+const styles = StyleSheet.create({
+  container: {
+    width: 170,
+    height: 280
+  },
+  image: {
+    height: 120,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0
+
+  }
+})
+
+
+
+export default PlayerComponent;
