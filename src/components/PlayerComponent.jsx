@@ -5,7 +5,7 @@ import { View } from 'react-native';
 
 const PlayerComponent = ({displayProps, playerData, coverColor}) => (
   <Card elevated key={playerData.StrikerName} style={styles.container} >
-    <Card.Cover source={{ uri: `https://scores.iplt20.com/ipl/playerimages/${playerData.StrikerName}.png`}} style={{...styles.image, backgroundColor: coverColor, borderRadius: 0}} resizeMode='contain' />
+    <Card.Cover source={{ uri: playerData.Image}} style={{...styles.image, backgroundColor: coverColor, borderRadius: 0}} resizeMode='contain' />
     <Text style={{ 
     textAlign: 'center', textTransform: 'uppercase', fontWeight: 900,
     backgroundColor: '#333', color: '#eee', fontStyle: 'italic'
