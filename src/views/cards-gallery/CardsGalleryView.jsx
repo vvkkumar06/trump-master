@@ -1,6 +1,7 @@
 import React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { FlatList } from 'react-native';
+import TMButton from '../../components/buttons/ButtonComponent';
 import GalleryItemComponent from '../../components/GalleryItemComponent';
 import TeamView from '../team/TeamView';
 import dummyData from './../../../data/cricket-players';
@@ -24,7 +25,15 @@ const CardsGalleryView = (props) => {
         }}
         keyExtractor={item => item.TMID}
       />
-      <TeamView />
+      <View style={styles.galleryRight}>
+        <TeamView />
+        <TMButton 
+          label="Play Now" 
+          type={'success'}
+          style={styles.playNow}
+          labelStyle={styles.playNowLabel}
+          />
+      </View>
     </View>)
 }
 
@@ -36,6 +45,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+  },
+  playNow: {
+    width: "100%",
+    marginTop: 15,
+    color: '#ccc'
+  },
+  galleryRight: {
+    alignItems: 'center'
+  },
+  playNowLabel: {
+    fontWeight: 'bold',
+    textTransform: 'uppercase'
   }
 })
 
