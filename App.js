@@ -1,3 +1,4 @@
+import { View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import CardsGalleryView from './src/views/cards-gallery/CardsGalleryView';
 // import { setupProfileImages } from './src/utils/player-images';
