@@ -1,26 +1,122 @@
-import React from 'react';
-import { Image } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Image, Animated, PanResponder, TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 
-const GalleryItemComponent = ({ playerData, coverColor }) => {
+const GalleryItemComponent = ({ playerData, coverColor, onPressHandler, zIndexHandler }) => {
+  const [isBeingDragged, setIsBeingDragged] = useState(false);
+  const [panResponder, setPanResponder] = useState(undefined);
+  const pan = useRef(new Animated.ValueXY()).current;
+  let longPressTimer = null;
+
+
+  const onLongPressPanResponder = useRef(
+    PanResponder.create({
+      onPanResponderTerminationRequest: () => false,
+      onStartShouldSetPanResponderCapture: () => true,
+      onPanResponderMove: Animated.event([
+        null, { dx: pan.x, dy: pan.y } 
+      ], {
+        useNativeDriver: false
+      }),
+      onPanResponderRelease: (e, { vx, vy }) => {
+        pan.flattenOffset()
+        Animated.spring(pan, {
+          toValue: { x: 0, y: 0 },
+          useNativeDriver: false
+        }).start();
+        setPanResponder(undefined);
+        setIsBeingDragged(false);
+        zIndexHandler(0, playerData.TMID);
+      }
+    })
+  ).current;
+
+  const normalPanResponder = useRef(
+    PanResponder.create({
+      onPanResponderTerminationRequest: () => false,
+      onStartShouldSetPanResponderCapture: () => true,
+      onPanResponderGrant: (e, gestureState) => {
+        pan.setValue({ x: 0, y: 0 })
+        longPressTimer = setTimeout(onLongPress, 400)
+      },
+      onPanResponderRelease: (e, { vx, vy }) => {
+        if (!panResponder) {
+          clearTimeout(longPressTimer);   // clean the timeout handler
+        }
+      }
+    })).current;
+
+  const onLongPress = () => {
+    setIsBeingDragged(true);
+    zIndexHandler(999, playerData.TMID);
+    setPanResponder(onLongPressPanResponder);
+  }
+
+  let panHandlers = {};
+  if (panResponder) {
+    panHandlers = panResponder.panHandlers
+  } else {
+    panHandlers = normalPanResponder.panHandlers
+  }
+
+  //@TODO for future reference
+  // const panResponder = useRef(
+  //   PanResponder.create({
+  //     onPanResponderGrant: (evt, gestureState) => {
+  //       setIsBeingDragged(true);
+  //       zIndexHandler(999, playerData.TMID);
+  //     },
+  //     onMoveShouldSetPanResponder: () => true,
+  //     onPanResponderMove: (e, gestureState) => {
+  //       const newPos = { x: gestureState.dx, y: gestureState.dy };
+  //       pan.setValue(newPos);
+  //     },
+  //     onPanResponderRelease: (e, gesture) => {
+  //       Animated.spring(
+  //         pan,
+  //         { toValue: { x: 0, y: 0 }, useNativeDriver: false }
+  //       ).start();
+  //       setIsBeingDragged(false);
+  //       zIndexHandler(0, playerData.TMID);
+  //     }
+  //   }),
+  // ).current;
+
   let name = playerData.PlayerName.split(' ');
-  let fName = name[0].substr(0,1);
+  let fName = name[0].substr(0, 1);
   let lName = name[1];
   name = `${fName} ${lName}`;
 
+  const renderItem = () => {
+    return (
+      <TouchableOpacity onPress={onPressHandler}>
+        <Card key={playerData.TMID} style={styles.container} >
+          <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor }} resizeMode='contain' />
+          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.id}>C#{playerData.TMID}</Text>
+          <View style={styles.topLeftBox} />
+          <Image
+            style={styles.logo}
+            source={require('./../../assets/images/app-icons/logo.png')}
+          />
+        </Card>
+      </TouchableOpacity>
+    )
+  }
+
   return (
-    <Card elevated={5} key={playerData.TMID} style={styles.container} >
-      <Card.Cover source={{ uri: playerData.Image}} style={{ ...styles.image, backgroundColor: coverColor }} resizeMode='contain' />
-      <Text style={styles.name}>{name}</Text>
-      <Text style={styles.id}>C#{playerData.TMID}</Text>
-      <View style={styles.topLeftBox}/>
-      <Image
-        style={styles.logo}
-        source={require('./../../assets/images/app-icons/logo.png')}
-      />
-    </Card>
-    );
+    <React.Fragment>
+      <Animated.View
+        key={playerData.TMID}
+        style={isBeingDragged ? [pan.getLayout(), { zIndex: 999 }] : [{ zIndex: 0 }]}
+        {...panHandlers}
+      >
+        {renderItem()}
+      </Animated.View>
+      {/* {renderItem()} */}
+    </React.Fragment>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -40,12 +136,12 @@ const styles = StyleSheet.create({
     borderRadius: 0
   },
   name: {
-    textAlign: 'center', 
-    textTransform: 'uppercase', 
+    textAlign: 'center',
+    textTransform: 'uppercase',
     fontWeight: 900,
     backgroundColor: '#333',
-    color: '#eee', 
-    fontStyle: 'italic', 
+    color: '#eee',
+    fontStyle: 'italic',
     fontSize: 8,
     position: 'absolute',
     bottom: 0,
@@ -78,7 +174,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 5,
     right: -3
-  },
+  }, cardDrag: {
+    zIndex: 999,
+    borderWidth: 1,
+    borderColor: 'red',
+  }
 })
 
 
