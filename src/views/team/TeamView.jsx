@@ -4,7 +4,7 @@ import { Card, Surface, Text } from 'react-native-paper';
 
 const TeamView = () => {
   return (
-    <Surface style={styles.container} elevation={4}>
+    <View style={styles.container}>
       <Text variant="titleLarge" style={styles.teamLabel}>Edit Team</Text>
       <View style={styles.teamContainer}>
         <Card id="player-1" style={{...styles.cardContainer, ...styles.player1}} mode={'outlined'}/>
@@ -13,7 +13,7 @@ const TeamView = () => {
         <Card id="player-4" style={{...styles.cardContainer, ...styles.player4}} mode={'outlined'}/>
         <Card id="player-5" style={{...styles.cardContainer, ...styles.player5}} mode={'outlined'}/>
       </View>
-    </Surface>
+    </View>
   )
 }
 
@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   container: {
     width: 300,
     height: 220,
-    backgroundColor: '#eee'
+    backgroundColor: 'transparent'
   },
   teamContainer: {
     flexDirection: 'row',

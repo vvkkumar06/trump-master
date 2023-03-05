@@ -1,121 +1,71 @@
 import React, { useRef, useState } from 'react';
-import { Image, Animated, PanResponder } from 'react-native';
+import { Image, Animated, TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
-import { Card, Text, TouchableRipple } from 'react-native-paper';
+import { Card, Text } from 'react-native-paper';
 
-const GalleryItemComponent = ({ playerData, coverColor, onPressHandler, zIndexHandler }) => {
-  const [isBeingDragged, setIsBeingDragged] = useState(false);
-  const [panResponder, setPanResponder] = useState(undefined);
-  const pan = useRef(new Animated.ValueXY()).current;
-  let longPressTimer = null;
-
-
-  const onLongPressPanResponder = useRef(
-    PanResponder.create({
-      onPanResponderTerminationRequest: () => false,
-      onStartShouldSetPanResponderCapture: () => true,
-      onPanResponderMove: Animated.event([
-        null, { dx: pan.x, dy: pan.y } 
-      ], {
-        useNativeDriver: false
-      }),
-      onPanResponderRelease: (e, { vx, vy }) => {
-        pan.flattenOffset()
-        Animated.spring(pan, {
-          toValue: { x: 0, y: 0 },
-          useNativeDriver: false
-        }).start();
-        setPanResponder(undefined);
-        setIsBeingDragged(false);
-        zIndexHandler(0, playerData.TMID);
-      }
-    })
-  ).current;
-
-  const normalPanResponder = useRef(
-    PanResponder.create({
-      onPanResponderTerminationRequest: () => false,
-      onStartShouldSetPanResponderCapture: () => true,
-      onPanResponderGrant: (e, gestureState) => {
-        pan.setValue({ x: 0, y: 0 })
-        longPressTimer = setTimeout(onLongPress, 400)
-      },
-      onPanResponderRelease: (e, { vx, vy }) => {
-        if (!panResponder) {
-          clearTimeout(longPressTimer);   // clean the timeout handler
-        }
-      }
-    })).current;
-
-  const onLongPress = () => {
-    setIsBeingDragged(true);
-    zIndexHandler(999, playerData.TMID);
-    setPanResponder(onLongPressPanResponder);
-  }
-
-  let panHandlers = {};
-  if (panResponder) {
-    panHandlers = panResponder.panHandlers
-  } else {
-    panHandlers = normalPanResponder.panHandlers
-  }
-
-  //@TODO for future reference
-  // const panResponder = useRef(
-  //   PanResponder.create({
-  //     onPanResponderGrant: (evt, gestureState) => {
-  //       setIsBeingDragged(true);
-  //       zIndexHandler(999, playerData.TMID);
-  //     },
-  //     onMoveShouldSetPanResponder: () => true,
-  //     onPanResponderMove: (e, gestureState) => {
-  //       const newPos = { x: gestureState.dx, y: gestureState.dy };
-  //       pan.setValue(newPos);
-  //     },
-  //     onPanResponderRelease: (e, gesture) => {
-  //       Animated.spring(
-  //         pan,
-  //         { toValue: { x: 0, y: 0 }, useNativeDriver: false }
-  //       ).start();
-  //       setIsBeingDragged(false);
-  //       zIndexHandler(0, playerData.TMID);
-  //     }
-  //   }),
-  // ).current;
+const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHandler, addAnimationEnd, longPressHandler }) => {
+  const [isLongPressed, setIsLongPressed] = useState(false);
+  const [cardSelectAnimEnd, setCardSelectAnimEnd] = useState(false);
 
   let name = playerData.PlayerName.split(' ');
   let fName = name[0].substr(0, 1);
   let lName = name[1];
   name = `${fName} ${lName}`;
 
+  const position = useRef(new Animated.ValueXY(0)).current;
+
+  const moveToRight = (id) => {
+    Animated.timing(position, {
+      toValue: {x: 400, y:0},
+      duration: 500,
+      useNativeDriver: false,
+    }).start(() =>{
+      position.setValue({x:0,y:0});
+      setCardSelectAnimEnd(true);
+      addAnimationEnd(id);
+    });
+  };
+
   const renderItem = () => {
+
     return (
-      <TouchableRipple onPress={onPressHandler}>
-        <Card key={playerData.TMID} style={styles.container} >
-          <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor }} resizeMode='contain' />
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.id}>C#{playerData.TMID}</Text>
-          <View style={styles.topLeftBox} />
-          <Image
-            style={styles.logo}
-            source={require('./../../assets/images/app-icons/logo.png')}
-          />
-        </Card>
-      </TouchableRipple>
+      <Animated.View {...((isLongPressed || cardSelectAnimEnd)  && {style: [
+          position.getLayout(),
+          {
+            zIndex: '999'
+          }
+        ]})}>
+        <TouchableOpacity
+          onPress={() => {
+            pressHandler(playerData.TMID)
+          
+          }}
+          onLongPress={() => {
+            longPressHandler(playerData.TMID);
+            setIsLongPressed(true);
+            setCardSelectAnimEnd(true);
+            moveToRight(playerData.TMID);
+          }}
+          onPressOut={() => {
+            setIsLongPressed(false);
+          }}
+        >
+          <Card key={playerData.TMID} style={{ ...styles.container, ...(isLongPressed && styles.longPress) }} >
+            <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor }} resizeMode='contain' />
+            <Text style={styles.name}>{name}</Text>
+            <Text style={styles.id}>C#{playerData.TMID}</Text>
+            <View style={styles.topLeftBox} />
+            <Image
+              style={styles.logo}
+              source={require('./../../assets/images/app-icons/logo.png')}
+            />
+          </Card>
+        </TouchableOpacity>
+      </Animated.View>
     )
   }
 
-  return (
-    <React.Fragment>
-      <Animated.View
-        key={playerData.TMID}
-        style={isBeingDragged ? [pan.getLayout(), styles.cardDrag] : [{ zIndex: 0 }]}
-        {...panHandlers}
-      >
-        {renderItem()}
-      </Animated.View>
-    </React.Fragment>
-  );
+  return renderItem();
 }
 
 const styles = StyleSheet.create({
@@ -173,11 +123,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 5,
     right: -3
-  }, cardDrag: {
-    zIndex: 999,
+  }, longPress: {
+    backgroundColor: 'rgba(0,255,0, 0.2)',
     borderWidth: 3,
-    borderColor: '#FFA726'
+    borderColor: 'rgba(0,255,0, 0.8)'
   }
+
 })
 
 

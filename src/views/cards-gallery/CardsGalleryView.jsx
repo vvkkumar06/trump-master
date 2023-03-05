@@ -1,81 +1,71 @@
-import React, { useRef, useState } from 'react';
-import { Animated, PanResponder, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
-import { FlatList } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
+import { SafeAreaView, StatusBar, StyleSheet, View, ScrollView, FlatList, ImageBackground } from 'react-native';
+import { Text } from 'react-native-paper';
 import TMButton from '../../components/buttons/ButtonComponent';
 import GalleryItemComponent from '../../components/GalleryItemComponent';
+import { cardsReducer, initialGalleryCardsState, transformGalleryCardStateToList } from '../../redux/cards-reducer';
 import TeamView from '../team/TeamView';
 import dummyData from './../../../data/cricket-players';
-
 const coverColor = '#ccc';
 
 const CardsGalleryView = (props) => {
-
+  const [galleryCardState, dispatch] = useReducer(cardsReducer, initialGalleryCardsState);
+  const [galleryData, setGalleryData] = useState([]);
   const containerRefs = useRef([]);
 
-  //@TODO: For future ref
-  // const renderList = () => {
-  //   return <FlatList
-  //     data={dummyData}
-  //     numColumns={4}
-  //     renderItem={({ item }) => {
-  //       return (
-  //         <View style={{ margin: 5 }} 
-  //         key={`gallery-item-container-${item.TMID}`}
-  //         ref={(ref) => containerRefs.current[item.TMID] = ref}
-  //         >
-  //           <GalleryItemComponent
-  //             playerData={item}
-  //             coverColor={coverColor}
-  //             onPressHandler={() => { }}
-  //             zIndexHandler={(z, id) => {
-  //               containerRefs.current[id].setNativeProps({
-  //                 style: {
-  //                  zIndex: z
-  //                 }
-  //               })}}
-  //           />
-  //         </View>)
-  //     }}
-  //     keyExtractor={item => item.TMID}
-  //   />
-  // }
+  useEffect(() => {
+    setGalleryData(transformGalleryCardStateToList(galleryCardState));
+  }, [galleryCardState]);
+
+  const renderList = () => {
+    return <FlatList
+      data={galleryData}
+      numColumns={4}
+      renderItem={({ item, index }) => {
+        return (
+          <View style={{ margin: 5 }}
+            key={`gallery-item-container-${item.TMID}`}
+            ref={(ref) => containerRefs.current[`${item.TMID}-${index}`] = ref}
+          >
+            <GalleryItemComponent
+              playerData={item}
+              coverColor={coverColor}
+              longPressHandler={(playerId) => {
+                containerRefs.current[`${playerId}-${index}`].setNativeProps({
+                  style: {
+                    zIndex: 999
+                  }
+                })
+              
+              }}
+              pressHandler={(playerId) => {
+                console.log('Press handler: ', playerId);
+              }}
+              addAnimationEnd = {(playerId)=>{
+                dispatch({ type: 'REMOVE', id: playerId});
+                containerRefs.current[`${playerId}-${index}`] = undefined;
+              }}
+            />
+          </View>)
+      }}
+      keyExtractor={item => item.TMID}
+    />
+  }
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 5, columnGap: 5 }}>
-          {dummyData.map(item => (
-            <View style={styles.galleryItemContainer}
-              key={`gallery-item-container-${item.TMID}`}
-              ref={(ref) => containerRefs.current[item.TMID] = ref}
-            >
-              <GalleryItemComponent
-                key={item.TMID}
-                playerData={item}
-                coverColor={coverColor}
-                onPressHandler={() => { }}
-                zIndexHandler={(z, id) => {
-                  containerRefs.current[id].setNativeProps({
-                    style: {
-                      zIndex: z
-                    }
-                  })
-                }}
-              />
-            </View>
-          ))}
+    <ImageBackground source={require('./../../../assets/background1.png')} resizeMode="cover" style={styles.background}>
+      <SafeAreaView style={styles.container}>
+        {galleryData && galleryData.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
+        <View style={styles.galleryRight}>
+          <TeamView />
+          <TMButton
+            label="Play Now"
+            type={'success'}
+            style={styles.playNow}
+            labelStyle={styles.playNowLabel}
+          />
         </View>
-      </ScrollView>
-      <View style={styles.galleryRight}>
-        <TeamView />
-        <TMButton
-          label="Play Now"
-          type={'success'}
-          style={styles.playNow}
-          labelStyle={styles.playNowLabel}
-        />
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </ImageBackground>
   )
 }
 
@@ -103,6 +93,13 @@ const styles = StyleSheet.create({
   galleryItemContainer: {
     width: 80,
     height: 80
+  },
+  background: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  noCards: {
+    fontStyle: 'italic'
   }
 })
 
