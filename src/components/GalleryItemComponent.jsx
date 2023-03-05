@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { Image, Animated, PanResponder, TouchableOpacity } from 'react-native';
+import { Image, Animated, PanResponder } from 'react-native';
 import { StyleSheet, View } from 'react-native';
-import { Card, Text } from 'react-native-paper';
+import { Card, Text, TouchableRipple } from 'react-native-paper';
 
 const GalleryItemComponent = ({ playerData, coverColor, onPressHandler, zIndexHandler }) => {
   const [isBeingDragged, setIsBeingDragged] = useState(false);
@@ -90,7 +90,7 @@ const GalleryItemComponent = ({ playerData, coverColor, onPressHandler, zIndexHa
 
   const renderItem = () => {
     return (
-      <TouchableOpacity onPress={onPressHandler}>
+      <TouchableRipple onPress={onPressHandler}>
         <Card key={playerData.TMID} style={styles.container} >
           <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor }} resizeMode='contain' />
           <Text style={styles.name}>{name}</Text>
@@ -101,7 +101,7 @@ const GalleryItemComponent = ({ playerData, coverColor, onPressHandler, zIndexHa
             source={require('./../../assets/images/app-icons/logo.png')}
           />
         </Card>
-      </TouchableOpacity>
+      </TouchableRipple>
     )
   }
 
@@ -109,20 +109,19 @@ const GalleryItemComponent = ({ playerData, coverColor, onPressHandler, zIndexHa
     <React.Fragment>
       <Animated.View
         key={playerData.TMID}
-        style={isBeingDragged ? [pan.getLayout(), { zIndex: 999 }] : [{ zIndex: 0 }]}
+        style={isBeingDragged ? [pan.getLayout(), styles.cardDrag] : [{ zIndex: 0 }]}
         {...panHandlers}
       >
         {renderItem()}
       </Animated.View>
-      {/* {renderItem()} */}
     </React.Fragment>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: 80,
-    height: 80,
+    width: 75,
+    height: 75,
     position: 'relative',
     borderRadius: 0,
     backgroundColor: '#999',
@@ -176,8 +175,8 @@ const styles = StyleSheet.create({
     right: -3
   }, cardDrag: {
     zIndex: 999,
-    borderWidth: 1,
-    borderColor: 'red',
+    borderWidth: 3,
+    borderColor: '#FFA726'
   }
 })
 
