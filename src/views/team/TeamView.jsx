@@ -1,12 +1,16 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { useSelector, useDispatch } from 'react-redux'
 import GalleryItemComponent from '../../components/GalleryItemComponent';
-import { initialTeamCardsState, teamReducer, transformTeamCardsStateToList } from '../../redux/team-reducer';
+import { removeFromTeam } from '../../redux/features/team-slice';
+import { addToGallery } from '../../redux/features/gallery-slice';
+import { transformTeamCardsStateToList } from '../../redux/reducers/utils';
 const coverColor = '#ccc';
 
 const TeamView = () => {
-  const [teamCards, dispatch] = useReducer(teamReducer, initialTeamCardsState);
+  const teamCards = useSelector((state) => state.teamCards)
+  const dispatch = useDispatch();
   const [players, setPlayers] = useState({});
 
   const containerRefs = useRef([]);
@@ -29,7 +33,8 @@ const TeamView = () => {
 
       }}
       addAnimationEnd={() => {
-        dispatch({ type: 'REMOVE', playerId: key });
+        dispatch(removeFromTeam({ playerId: key }));
+        dispatch(addToGallery({id: item.TMID}))
         containerRefs.current[key] = undefined;
       }}
     />

@@ -1,4 +1,6 @@
 import { View } from 'react-native';
+import store from './src/redux/store';
+import { Provider } from 'react-redux'
 import { Provider as PaperProvider } from 'react-native-paper';
 import CardsGalleryView from './src/views/cards-gallery/CardsGalleryView';
 // import { setupProfileImages } from './src/utils/player-images';
@@ -8,7 +10,9 @@ import CardsGalleryView from './src/views/cards-gallery/CardsGalleryView';
 export default function App() {
   return (
     <PaperProvider>
-      <CardsGalleryView />
+      <Provider store={store}>
+        <CardsGalleryView />
+      </Provider>
     </PaperProvider>
   );
 }

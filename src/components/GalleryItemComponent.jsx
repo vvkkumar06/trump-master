@@ -3,7 +3,7 @@ import { Image, Animated, TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 
-const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHandler, addAnimationEnd, longPressHandler, toLeftAnim }) => {
+const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHandler, canSelect = true, addAnimationEnd, longPressHandler, toLeftAnim }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
   const [cardSelectAnimEnd, setCardSelectAnimEnd] = useState(false);
 
@@ -13,38 +13,50 @@ const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHa
   name = `${fName} ${lName}`;
 
   const position = useRef(new Animated.ValueXY(0)).current;
+  const opacity = useRef(new Animated.Value(1)).current;
 
   const moveToRight = (id) => {
-    Animated.timing(position, {
-      toValue: {x: toLeftAnim ? -400 : 400, y:0},
-      duration: 500,
-      useNativeDriver: false,
-    }).start(() =>{
-      position.setValue({x:0,y:0});
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: false
+      }),
+      Animated.timing(position, {
+        toValue: { x: toLeftAnim ? -400 : 400, y: 0 },
+        duration: 500,
+        useNativeDriver: false
+      }
+      )
+    ]).start(() => {
+      position.setValue({ x: 0, y: 0 });
       setCardSelectAnimEnd(true);
       addAnimationEnd(id);
     });
+
   };
 
   const renderItem = () => {
 
     return (
-      <Animated.View {...((isLongPressed || cardSelectAnimEnd)  && {style: [
+      <Animated.View {...((isLongPressed || cardSelectAnimEnd) && {
+        style: [
           position.getLayout(),
           {
-            zIndex: '999'
+            zIndex: '999',
+            opacity: opacity
           }
-        ]})}>
+        ]
+      })}>
         <TouchableOpacity
           onPress={() => {
-            pressHandler(playerData.TMID)
-          
           }}
           onLongPress={() => {
             longPressHandler(playerData.TMID);
             setIsLongPressed(true);
-            setCardSelectAnimEnd(true);
-            moveToRight(playerData.TMID);
+            if (canSelect) {
+              moveToRight(playerData.TMID);
+            }
           }}
           onPressOut={() => {
             setIsLongPressed(false);

@@ -1,16 +1,23 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View, ScrollView, FlatList, ImageBackground } from 'react-native';
 import { Text } from 'react-native-paper';
+import { useSelector, useDispatch } from 'react-redux'
 import TMButton from '../../components/buttons/ButtonComponent';
 import GalleryItemComponent from '../../components/GalleryItemComponent';
-import { cardsReducer, initialGalleryCardsState, transformGalleryCardStateToList } from '../../redux/cards-reducer';
+import { removeFromGallery } from '../../redux/features/gallery-slice';
+import { addToTeam } from '../../redux/features/team-slice';
+import { transformGalleryCardStateToList } from '../../redux/reducers/utils';
+import { findVacantPlayer } from '../../redux/reducers/utils';
 import TeamView from '../team/TeamView';
 import dummyData from './../../../data/cricket-players';
 const coverColor = '#ccc';
 
 const CardsGalleryView = (props) => {
-  const [galleryCardState, dispatch] = useReducer(cardsReducer, initialGalleryCardsState);
   const [galleryData, setGalleryData] = useState([]);
+  const galleryCardState = useSelector((state) => state.galleryCards);
+  const teamCardState = useSelector((state) => state.teamCards);
+  const dispatch = useDispatch()
+
   const containerRefs = useRef([]);
 
   useEffect(() => {
@@ -30,20 +37,20 @@ const CardsGalleryView = (props) => {
             <GalleryItemComponent
               playerData={item}
               coverColor={coverColor}
-              longPressHandler={(playerId) => {
-                containerRefs.current[`${playerId}-${index}`].setNativeProps({
+              longPressHandler={(id) => {
+                containerRefs.current[`${id}-${index}`] && containerRefs.current[`${id}-${index}`].setNativeProps({
                   style: {
                     zIndex: 999
                   }
                 })
               
               }}
-              pressHandler={(playerId) => {
-                console.log('Press handler: ', playerId);
-              }}
-              addAnimationEnd = {(playerId)=>{
-                dispatch({ type: 'REMOVE', id: playerId});
-                containerRefs.current[`${playerId}-${index}`] = undefined;
+              canSelect={findVacantPlayer(teamCardState) ? true : false}
+              addAnimationEnd = {(id)=>{
+                dispatch(removeFromGallery({id}));
+                let vacantPlayerId = findVacantPlayer(teamCardState);
+                dispatch(addToTeam({playerId: vacantPlayerId, id}));
+                containerRefs.current[`${id}-${index}`] = undefined;
               }}
             />
           </View>)

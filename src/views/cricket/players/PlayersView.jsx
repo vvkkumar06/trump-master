@@ -3,7 +3,6 @@ import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { FlatList } from 'react-native';
 import PlayerComponent from '../../../components/PlayerComponent';
 import { CricketPlayerDisplayProps } from '../../../utils/display-properties';
-// import { getPlayerProfileImage } from '../../../utils/player-images';
 import dummyData from './../../../../data/players';
 
 let cricData = [...Object.values(dummyData)];
@@ -28,7 +27,6 @@ const PlayersView = (props) => {
             <PlayerComponent 
             displayProps = {CricketPlayerDisplayProps} 
             playerData={item} 
-            // playerImage ={getPlayerProfileImage(item.StrikerName)}
             coverColor={generateColor()} />
           </View>
         }}
