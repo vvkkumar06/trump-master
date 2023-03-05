@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import allCricketPlayers from '../../data/cricket-players';
+import { store } from './store';
+import { findVacantPlayer } from './team-reducer';
 
 export const initialGalleryCardsState = {
   1: {
@@ -32,6 +34,7 @@ export const cardsReducer = (state, action) => {
       Object.keys(state).map(id => {
         if(action.id == id){
           newState[id].count = newState[id].count - 1;
+          // findVacantPlayer()
         }
       });
       return newState;

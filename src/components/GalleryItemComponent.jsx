@@ -3,7 +3,7 @@ import { Image, Animated, TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 
-const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHandler, addAnimationEnd, longPressHandler }) => {
+const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHandler, addAnimationEnd, longPressHandler, toLeftAnim }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
   const [cardSelectAnimEnd, setCardSelectAnimEnd] = useState(false);
 
@@ -16,7 +16,7 @@ const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHa
 
   const moveToRight = (id) => {
     Animated.timing(position, {
-      toValue: {x: 400, y:0},
+      toValue: {x: toLeftAnim ? -400 : 400, y:0},
       duration: 500,
       useNativeDriver: false,
     }).start(() =>{
