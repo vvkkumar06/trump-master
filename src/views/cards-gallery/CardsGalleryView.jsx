@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, View, ScrollView, FlatList, ImageBackground } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { SafeAreaView, StatusBar, StyleSheet, View, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux'
 import TMButton from '../../components/buttons/ButtonComponent';
@@ -17,9 +17,7 @@ const CardsGalleryView = (props) => {
   const [selectedCard, setSelectedCard] = useState(undefined);
   const galleryCardState = useSelector((state) => state.galleryCards);
   const teamCardState = useSelector((state) => state.teamCards);
-  const dispatch = useDispatch()
-
-  const containerRefs = useRef([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setGalleryData(transformGalleryCardStateToList(galleryCardState));
@@ -30,33 +28,26 @@ const CardsGalleryView = (props) => {
     return <FlatList
       data={galleryData}
       numColumns={4}
+      showsVerticalScrollIndicator={false}
+      ItemSeparatorComponent={() => (
+        <View style={{ height: 10 }} />
+      )}
+      columnWrapperStyle={{
+        justifyContent: "space-between",
+      }}
       renderItem={({ item, index }) => {
         return (
-          <View style={{ margin: 5 }}
-            key={`gallery-item-container-${item.TMID}`}
-            ref={(ref) => containerRefs.current[`${item.TMID}-${index}`] = ref}
-          >
-            <GalleryItemComponent
-              playerData={item}
-              coverColor={coverColor}
-              pressHandler={(id) => setSelectedCard(id)}
-              blurHandler={(id) => setSelectedCard(undefined)}
-              longPressHandler={(id) => {
-                containerRefs.current[`${id}-${index}`] && containerRefs.current[`${id}-${index}`].setNativeProps({
-                  style: {
-                    zIndex: 999
-                  }
-                })
-
-              }}
-              canSelect={vacantPlayerId ? true : false}
-              animationStop={(id) => {
-                dispatch(removeFromGallery({ id }));
-                dispatch(addToTeam({ playerId: vacantPlayerId, id }));
-                containerRefs.current[`${id}-${index}`] = undefined;
-              }}
-            />
-          </View>)
+          <GalleryItemComponent
+            playerData={item}
+            coverColor={coverColor}
+            pressHandler={(id) => setSelectedCard(id)}
+            canSelect={vacantPlayerId && !selectedCard ? true : false}
+            animationStop={(id) => {
+              dispatch(removeFromGallery({ id }));
+              dispatch(addToTeam({ playerId: vacantPlayerId, id }));
+            }}
+          />
+        )
       }}
       keyExtractor={item => item.TMID}
     />
@@ -66,32 +57,39 @@ const CardsGalleryView = (props) => {
   }, [selectedCard]);
 
   return (
-    <ImageBackground source={require('./../../../assets/background1.png')} resizeMode="cover" style={styles.background}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.galleryLeft}>
-          {galleryData && galleryData.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
-        </View>
-        <View style={styles.galleryRight}>
-          {
-            selectedCard ? (
-              <CardDetailsView playerData={selectedPlayerData} />
-            ) : (
-              <>
-                <TeamView />
-                <TMButton
-                  label="Play Now"
-                  type={'success'}
-                  style={styles.playNow}
-                  labelStyle={styles.playNowLabel}
-                />
-              </>
+    <TouchableOpacity
+      onPress={() => {
+        setSelectedCard(undefined)
+      }}
+      activeOpacity={1}
+      style={styles.background}
+    >
+      <ImageBackground source={require('./../../../assets/background1.png')} resizeMode="cover" style={styles.background}>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.galleryLeft}>
+            {galleryData && galleryData.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
+          </View>
+          <View style={styles.galleryRight}>
+            {
+              selectedCard ? (
+                <CardDetailsView playerData={selectedPlayerData} />
+              ) : (
+                <>
+                  <TeamView />
+                  <TMButton
+                    label="Play Now"
+                    type={'success'}
+                    style={styles.playNow}
+                    labelStyle={styles.playNowLabel}
+                  />
+                </>
 
-            )
-          }
-
-        </View>
-      </SafeAreaView>
-    </ImageBackground>
+              )
+            }
+          </View>
+        </SafeAreaView>
+      </ImageBackground>
+    </TouchableOpacity>
   )
 }
 
@@ -109,8 +107,8 @@ const styles = StyleSheet.create({
     marginTop: 15,
     color: '#ccc'
   },
-  galleryLeft:{
-    width: '60%'
+  galleryLeft: {
+    width: '50%'
   },
   galleryRight: {
     alignItems: 'center',

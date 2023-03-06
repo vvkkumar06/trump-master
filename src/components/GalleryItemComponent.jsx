@@ -7,7 +7,6 @@ const GalleryItemComponent = ({
   playerData, 
   coverColor,
   pressHandler, 
-  blurHandler, 
   pressOutHandler, 
   canSelect = true, 
   animationStop, 
@@ -89,13 +88,10 @@ const resetAnimation = (cb) => {
       })}>
         <TouchableOpacity
           onPress={() => {
-            pressHandler(playerData.TMID)
-          }}
-          onBlur ={() =>{
-            blurHandler(playerData.TMID)
+            pressHandler && pressHandler(playerData.TMID)
           }}
           onLongPress={() => {
-            longPressHandler(playerData.TMID);
+            longPressHandler && longPressHandler(playerData.TMID);
             setIsLongPressed(true);
             if (canSelect) {
               moveToRight(playerData.TMID);
@@ -105,7 +101,7 @@ const resetAnimation = (cb) => {
             setIsLongPressed(false);
           }}
         >
-          <Card key={playerData.TMID} style={{ ...styles.container, ...(isLongPressed && styles.longPress) }} >
+          <Card key={playerData.TMID} style={{ ...styles.container, ...(isLongPressed && styles.longPress), ...(!canSelect && isLongPressed && styles.canSelect)}} >
             <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor }} resizeMode='contain' />
             <Text style={styles.name}>{name}</Text>
             <Text style={styles.id}>C#{playerData.TMID}</Text>
@@ -182,6 +178,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,255,0, 0.2)',
     borderWidth: 3,
     borderColor: 'rgba(0,255,0, 0.8)'
+  }, canSelect: {
+    backgroundColor: 'rgba(255,0,0, 0.2)',
+    borderWidth: 3,
+    borderColor: 'rgba(255,0,0, 0.8)'
   }
 
 })
