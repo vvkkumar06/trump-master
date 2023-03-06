@@ -5,6 +5,8 @@ import { View } from 'react-native';
 
 const PlayerComponent = ({displayProps, playerData, coverColor}) => (
   <Card elevated key={playerData.PlayerName} style={styles.container} >
+    <View style={styles.topLeftBox} />
+    <Text style={styles.id}>C#{playerData.TMID}</Text>
     <Card.Cover source={{ uri: playerData.Image}} style={{...styles.image, backgroundColor: coverColor, borderRadius: 0}} resizeMode='contain' />
     <Text style={{ 
     textAlign: 'center', textTransform: 'uppercase', fontWeight: 900,
@@ -32,7 +34,6 @@ const PlayerComponent = ({displayProps, playerData, coverColor}) => (
           </View>)
         }) : []
       }
-      
     </View>
   </Card>
 );
@@ -41,13 +42,38 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
-    borderRadius: 0
+    borderRadius: 0,
+    position: 'relative',
+    backgroundColor: '#999'
   },
   image: {
-    height: 120,
+    height: 100,
     borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0
-  }
+    borderBottomRightRadius: 0,
+    borderTopLeftRadius: 55,
+    borderRadius: 0
+  },
+  topLeftBox: {
+    width: 150,
+    height: 20,
+    top: 0,
+    backgroundColor: '#ccc',
+    borderTopRightRadius: 55
+  },
+  id: {
+    position: 'absolute',
+    top: 70,
+    left: 0,
+    backgroundColor: '#aaa',
+    color: '#111',
+    width: 100,
+    height: 40,
+    fontWeight: 900,
+    fontSize: 24,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    zIndex: 1
+  },
 })
 
 
