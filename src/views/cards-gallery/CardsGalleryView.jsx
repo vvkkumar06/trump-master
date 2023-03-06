@@ -9,7 +9,6 @@ import { addToTeam } from '../../redux/features/team-slice';
 import { transformGalleryCardStateToList } from '../../redux/reducers/utils';
 import { findVacantPlayer } from '../../redux/reducers/utils';
 import TeamView from '../team/TeamView';
-import dummyData from './../../../data/cricket-players';
 const coverColor = '#ccc';
 
 const CardsGalleryView = (props) => {
@@ -17,7 +16,7 @@ const CardsGalleryView = (props) => {
   const galleryCardState = useSelector((state) => state.galleryCards);
   const teamCardState = useSelector((state) => state.teamCards);
   const dispatch = useDispatch()
-
+  
   const containerRefs = useRef([]);
 
   useEffect(() => {
@@ -25,6 +24,7 @@ const CardsGalleryView = (props) => {
   }, [galleryCardState]);
 
   const renderList = () => {
+    const vacantPlayerId = findVacantPlayer(teamCardState);
     return <FlatList
       data={galleryData}
       numColumns={4}
@@ -45,10 +45,9 @@ const CardsGalleryView = (props) => {
                 })
               
               }}
-              canSelect={findVacantPlayer(teamCardState) ? true : false}
-              addAnimationEnd = {(id)=>{
+              canSelect={vacantPlayerId ? true : false}
+              animationStop = {(id)=>{
                 dispatch(removeFromGallery({id}));
-                let vacantPlayerId = findVacantPlayer(teamCardState);
                 dispatch(addToTeam({playerId: vacantPlayerId, id}));
                 containerRefs.current[`${id}-${index}`] = undefined;
               }}

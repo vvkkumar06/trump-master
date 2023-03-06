@@ -1,9 +1,10 @@
 import _ from 'lodash';
 import allCricketPlayers from '../../../data/cricket-players';
 export const transformGalleryCardStateToList = (data) => {
+  let tempData = _.cloneDeep(data);
   let galleryItems = [];
-  Object.keys(data).forEach(key => {
-    for(let i=0; i<data[key].count; i++) {
+  Object.keys(tempData).forEach(key => {
+    for(let i=0; i<tempData[key].count; i++) {
       galleryItems.push(allCricketPlayers.find(item => item.TMID == key));
     }
   });

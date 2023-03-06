@@ -32,7 +32,7 @@ const TeamView = () => {
         })
 
       }}
-      addAnimationEnd={() => {
+      animationStop={() => {
         dispatch(removeFromTeam({ playerId: key }));
         dispatch(addToGallery({id: item.TMID}))
         containerRefs.current[key] = undefined;

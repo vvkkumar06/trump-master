@@ -1,11 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, Animated, TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 
-const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHandler, canSelect = true, addAnimationEnd, longPressHandler, toLeftAnim }) => {
+const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHandler, canSelect = true, animationStop, longPressHandler, toLeftAnim }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
-  const [cardSelectAnimEnd, setCardSelectAnimEnd] = useState(false);
+  const [animInProgress, setAnimInProgress] = useState(false);
 
   let name = playerData.PlayerName.split(' ');
   let fName = name[0].substr(0, 1);
@@ -14,36 +14,66 @@ const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHa
 
   const position = useRef(new Animated.ValueXY(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
+  const zIndex = useRef(new Animated.Value(0)).current;
 
   const moveToRight = (id) => {
+    setAnimInProgress(true);
     Animated.parallel([
+      Animated.timing(zIndex, {
+        toValue: 999,
+        duration: 0,
+        useNativeDriver: false
+      }),
       Animated.timing(opacity, {
         toValue: 0,
-        duration: 400,
+        duration: 200,
         useNativeDriver: false
       }),
       Animated.timing(position, {
         toValue: { x: toLeftAnim ? -400 : 400, y: 0 },
-        duration: 500,
+        duration: 300,
         useNativeDriver: false
       }
       )
     ]).start(() => {
-      position.setValue({ x: 0, y: 0 });
-      setCardSelectAnimEnd(true);
-      addAnimationEnd(id);
+      resetAnimation(() => {
+        setAnimInProgress(false);
+        animationStop(id);
+      })
     });
-
   };
+
+const resetAnimation = (cb) => {
+  Animated.parallel([
+    Animated.timing(zIndex, {
+      toValue: 0,
+      duration: 0,
+      useNativeDriver: false
+    }),
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 0,
+      useNativeDriver: false
+    }),
+    Animated.timing(position, {
+      toValue: { x: 0, y: 0 },
+      duration: 0,
+      useNativeDriver: false
+    }
+    )
+  ]).start(() => {
+    cb()
+  });
+}
 
   const renderItem = () => {
 
     return (
-      <Animated.View {...((isLongPressed || cardSelectAnimEnd) && {
+      <Animated.View {...((isLongPressed || animInProgress) && {
         style: [
-          position.getLayout(),
+          { transform: position.getTranslateTransform()},
           {
-            zIndex: '999',
+            zIndex: zIndex,
             opacity: opacity
           }
         ]
