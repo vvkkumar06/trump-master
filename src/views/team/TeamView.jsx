@@ -97,8 +97,8 @@ const styles = StyleSheet.create({
   teamLabel: {
     fontWeight: 'bold',
     textAlign: 'center',
-    backgroundColor: '#333',
-    color: '#ccc',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    color: '#eee',
     height: 30,
     fontStyle: 'italic',
     borderBottomColor: 'red'

@@ -23,6 +23,15 @@ const CardsGalleryView = (props) => {
     setGalleryData(transformGalleryCardStateToList(galleryCardState));
   }, [galleryCardState]);
 
+
+  const galleryHeader = () => {
+    return (
+      <View style={styles.galleryHeader}>
+        <Text variant="titleLarge" style={styles.galleryLabel}>My Collection</Text>
+      </View>
+    )
+  }
+
   const renderList = () => {
     const vacantPlayerId = findVacantPlayer(teamCardState);
     return <FlatList
@@ -33,7 +42,7 @@ const CardsGalleryView = (props) => {
         <View style={{ height: 10 }} />
       )}
       columnWrapperStyle={{
-        justifyContent: "space-between",
+        gap: 10
       }}
       renderItem={({ item, index }) => {
         return (
@@ -67,6 +76,7 @@ const CardsGalleryView = (props) => {
       <ImageBackground source={require('./../../../assets/background1.png')} resizeMode="cover" style={styles.background}>
         <SafeAreaView style={styles.container}>
           <View style={styles.galleryLeft}>
+            {galleryHeader()}
             {galleryData && galleryData.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
           </View>
           <View style={styles.galleryRight}>
@@ -128,6 +138,19 @@ const styles = StyleSheet.create({
   },
   noCards: {
     fontStyle: 'italic'
+  },
+  galleryHeader: {
+    height: 30,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 5,
+    marginRight: 10
+  },
+  galleryLabel: {
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    color: '#eee'
   }
 })
 
