@@ -1,14 +1,14 @@
 export const CricketPlayerDisplayProps = {
   'Matches': 'MAT',
-  'TotalRuns': 'RUN',
+  'Runs': 'RUN',
   'StrikeRate': 'STR',
-  'BattingAverage': 'AVG',
+  'BattingAvg': 'AVG',
   'HighestScore': 'HS',
+  'Fours': 'FOUR',
   'Sixes': 'SIX',
-  'BBIW': 'BST',
-  'BowlingAverage': 'BAVG',
-  'EconomyRate': 'ECO',
-  'DotBallsBowled': 'DOT',
+  'BBM': 'BST',
+  'Econ': 'ECO',
   'Wickets': 'WKT',
-  'OversBowled': 'OVR'
+  'Catches': 'CAT',
+  "Stumpings": "STM",
 }
