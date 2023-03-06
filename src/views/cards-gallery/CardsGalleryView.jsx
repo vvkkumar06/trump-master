@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View, ScrollView, FlatList, ImageBackground } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux'
@@ -8,15 +8,17 @@ import { removeFromGallery } from '../../redux/features/gallery-slice';
 import { addToTeam } from '../../redux/features/team-slice';
 import { transformGalleryCardStateToList } from '../../redux/reducers/utils';
 import { findVacantPlayer } from '../../redux/reducers/utils';
+import CardDetailsView from '../detail/CardDetailsView';
 import TeamView from '../team/TeamView';
 const coverColor = '#ccc';
 
 const CardsGalleryView = (props) => {
   const [galleryData, setGalleryData] = useState([]);
+  const [selectedCard, setSelectedCard] = useState(undefined);
   const galleryCardState = useSelector((state) => state.galleryCards);
   const teamCardState = useSelector((state) => state.teamCards);
   const dispatch = useDispatch()
-  
+
   const containerRefs = useRef([]);
 
   useEffect(() => {
@@ -37,18 +39,20 @@ const CardsGalleryView = (props) => {
             <GalleryItemComponent
               playerData={item}
               coverColor={coverColor}
+              pressHandler={(id) => setSelectedCard(id)}
+              blurHandler={(id) => setSelectedCard(undefined)}
               longPressHandler={(id) => {
                 containerRefs.current[`${id}-${index}`] && containerRefs.current[`${id}-${index}`].setNativeProps({
                   style: {
                     zIndex: 999
                   }
                 })
-              
+
               }}
               canSelect={vacantPlayerId ? true : false}
-              animationStop = {(id)=>{
-                dispatch(removeFromGallery({id}));
-                dispatch(addToTeam({playerId: vacantPlayerId, id}));
+              animationStop={(id) => {
+                dispatch(removeFromGallery({ id }));
+                dispatch(addToTeam({ playerId: vacantPlayerId, id }));
                 containerRefs.current[`${id}-${index}`] = undefined;
               }}
             />
@@ -57,18 +61,34 @@ const CardsGalleryView = (props) => {
       keyExtractor={item => item.TMID}
     />
   }
+  const selectedPlayerData = useMemo(() => {
+    return galleryData.find(card => card.TMID === selectedCard)
+  }, [selectedCard]);
+
   return (
     <ImageBackground source={require('./../../../assets/background1.png')} resizeMode="cover" style={styles.background}>
       <SafeAreaView style={styles.container}>
-        {galleryData && galleryData.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
+        <View style={styles.galleryLeft}>
+          {galleryData && galleryData.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
+        </View>
         <View style={styles.galleryRight}>
-          <TeamView />
-          <TMButton
-            label="Play Now"
-            type={'success'}
-            style={styles.playNow}
-            labelStyle={styles.playNowLabel}
-          />
+          {
+            selectedCard ? (
+              <CardDetailsView playerData={selectedPlayerData} />
+            ) : (
+              <>
+                <TeamView />
+                <TMButton
+                  label="Play Now"
+                  type={'success'}
+                  style={styles.playNow}
+                  labelStyle={styles.playNowLabel}
+                />
+              </>
+
+            )
+          }
+
         </View>
       </SafeAreaView>
     </ImageBackground>
@@ -89,8 +109,12 @@ const styles = StyleSheet.create({
     marginTop: 15,
     color: '#ccc'
   },
+  galleryLeft:{
+    width: '60%'
+  },
   galleryRight: {
-    alignItems: 'center'
+    alignItems: 'center',
+    width: '40%'
   },
   playNowLabel: {
     fontWeight: 'bold',

@@ -4,12 +4,12 @@ import {Card, Text } from 'react-native-paper';
 import { View } from 'react-native';
 
 const PlayerComponent = ({displayProps, playerData, coverColor}) => (
-  <Card elevated key={playerData.StrikerName} style={styles.container} >
+  <Card elevated key={playerData.PlayerName} style={styles.container} >
     <Card.Cover source={{ uri: playerData.Image}} style={{...styles.image, backgroundColor: coverColor, borderRadius: 0}} resizeMode='contain' />
     <Text style={{ 
     textAlign: 'center', textTransform: 'uppercase', fontWeight: 900,
     backgroundColor: '#333', color: '#eee', fontStyle: 'italic'
-    }}>{playerData.StrikerName}</Text>
+    }}>{playerData.PlayerName}</Text>
     <View style={{justifyContent: 'space-between', flexDirection: 'row', 
     padding: 0,flexWrap: 'wrap'}}>
       {     
@@ -39,15 +39,14 @@ const PlayerComponent = ({displayProps, playerData, coverColor}) => (
 
 const styles = StyleSheet.create({
   container: {
-    width: 170,
-    height: 270,
+    width: '100%',
+    height: '100%',
     borderRadius: 0
   },
   image: {
     height: 120,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0
-
   }
 })
 

@@ -3,7 +3,16 @@ import { Image, Animated, TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 
-const GalleryItemComponent = ({ playerData, coverColor, pressHandler, pressOutHandler, canSelect = true, animationStop, longPressHandler, toLeftAnim }) => {
+const GalleryItemComponent = ({ 
+  playerData, 
+  coverColor,
+  pressHandler, 
+  blurHandler, 
+  pressOutHandler, 
+  canSelect = true, 
+  animationStop, 
+  longPressHandler, 
+  toLeftAnim }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
   const [animInProgress, setAnimInProgress] = useState(false);
 
@@ -80,6 +89,10 @@ const resetAnimation = (cb) => {
       })}>
         <TouchableOpacity
           onPress={() => {
+            pressHandler(playerData.TMID)
+          }}
+          onBlur ={() =>{
+            blurHandler(playerData.TMID)
           }}
           onLongPress={() => {
             longPressHandler(playerData.TMID);

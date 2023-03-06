@@ -23,6 +23,12 @@ export const galleryCardsSlice = createSlice({
     },
     203: {
       count: 4
+    },
+    15: {
+      count: 1
+    },
+    4: {
+      count: 2
     }
   },
   reducers: {
