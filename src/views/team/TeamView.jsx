@@ -6,9 +6,11 @@ import GalleryItemComponent from '../../components/GalleryItemComponent';
 import { removeFromTeam } from '../../redux/features/team-slice';
 import { addToGallery } from '../../redux/features/gallery-slice';
 import { transformTeamCardsStateToList } from '../../redux/reducers/utils';
+import { useGetAllPlayersQuery } from '../../redux/features/cricket-slice';
 const coverColor = '#ccc';
 
 const TeamView = () => {
+  const { data: playersApiData, error, isLoading } = useGetAllPlayersQuery();
   const teamCards = useSelector((state) => state.teamCards)
   const dispatch = useDispatch();
   const [players, setPlayers] = useState({});
@@ -16,8 +18,8 @@ const TeamView = () => {
   const containerRefs = useRef([]);
 
   useEffect(() => {
-    setPlayers(transformTeamCardsStateToList(teamCards));
-  }, [teamCards]);
+    playersApiData && setPlayers(transformTeamCardsStateToList(teamCards, playersApiData));
+  }, [teamCards, playersApiData]);
 
   const getGalleryItem = (item, key) => {
     return <GalleryItemComponent

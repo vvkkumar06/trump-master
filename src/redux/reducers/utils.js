@@ -1,21 +1,20 @@
 import _ from 'lodash';
-import allCricketPlayers from '../../../data/cricket-players';
-export const transformGalleryCardStateToList = (data) => {
+export const transformGalleryCardStateToList = (data, playersApiData) => {
   let tempData = _.cloneDeep(data);
   let galleryItems = [];
   Object.keys(tempData).forEach(key => {
     for(let i=0; i<tempData[key].count; i++) {
-      galleryItems.push(allCricketPlayers.find(item => item.TMID == key));
+      galleryItems.push(playersApiData.find(item => item.TMID == key));
     }
   });
   return galleryItems;
 }
 
 
-export const transformTeamCardsStateToList = (data) => {
+export const transformTeamCardsStateToList = (data, playersApiData) => {
   const team = {};
   for(let key in data) {
-    team[key] = allCricketPlayers.find(item => item.TMID == data[key]);
+    team[key] = playersApiData.find(item => item.TMID == data[key]);
   }
   return team;
 }

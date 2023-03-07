@@ -4,6 +4,7 @@ import { Text } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux'
 import TMButton from '../../components/buttons/ButtonComponent';
 import GalleryItemComponent from '../../components/GalleryItemComponent';
+import { useGetAllPlayersQuery } from '../../redux/features/cricket-slice';
 import { removeFromGallery } from '../../redux/features/gallery-slice';
 import { addToTeam } from '../../redux/features/team-slice';
 import { transformGalleryCardStateToList } from '../../redux/reducers/utils';
@@ -13,6 +14,8 @@ import TeamView from '../team/TeamView';
 const coverColor = '#ccc';
 
 const CardsGalleryView = (props) => {
+  const { data: playersApiData, error, isLoading } = useGetAllPlayersQuery();
+
   const [galleryData, setGalleryData] = useState([]);
   const [selectedCard, setSelectedCard] = useState(undefined);
   const galleryCardState = useSelector((state) => state.galleryCards);
@@ -20,8 +23,8 @@ const CardsGalleryView = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setGalleryData(transformGalleryCardStateToList(galleryCardState));
-  }, [galleryCardState]);
+    playersApiData && setGalleryData(transformGalleryCardStateToList(galleryCardState, playersApiData));
+  }, [galleryCardState, playersApiData]);
 
 
   const galleryHeader = () => {
