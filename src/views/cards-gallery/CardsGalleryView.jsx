@@ -4,7 +4,7 @@ import { Text } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux'
 import TMButton from '../../components/buttons/ButtonComponent';
 import GalleryItemComponent from '../../components/GalleryItemComponent';
-import { useGetAllPlayersQuery } from '../../redux/features/cricket-slice';
+import { useCricketCollectionQuery, useCricketTeamQuery } from '../../redux/features/cricket-slice';
 import { removeFromGallery } from '../../redux/features/gallery-slice';
 import { addToTeam } from '../../redux/features/team-slice';
 import { transformGalleryCardStateToList } from '../../redux/reducers/utils';
@@ -14,17 +14,11 @@ import TeamView from '../team/TeamView';
 const coverColor = '#ccc';
 
 const CardsGalleryView = (props) => {
-  const { data: playersApiData, error, isLoading } = useGetAllPlayersQuery();
+  const { data: galleryData } = useCricketCollectionQuery();
+  const { data: teamCards } = useCricketTeamQuery();
 
-  const [galleryData, setGalleryData] = useState([]);
   const [selectedCard, setSelectedCard] = useState(undefined);
-  const galleryCardState = useSelector((state) => state.galleryCards);
-  const teamCardState = useSelector((state) => state.teamCards);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    playersApiData && setGalleryData(transformGalleryCardStateToList(galleryCardState, playersApiData));
-  }, [galleryCardState, playersApiData]);
 
 
   const galleryHeader = () => {
@@ -36,9 +30,9 @@ const CardsGalleryView = (props) => {
   }
 
   const renderList = () => {
-    const vacantPlayerId = findVacantPlayer(teamCardState);
+    const vacantPlayerId = teamCards && findVacantPlayer(teamCards);
     return <FlatList
-      data={galleryData}
+      data={galleryData || []}
       numColumns={4}
       showsVerticalScrollIndicator={false}
       ItemSeparatorComponent={() => (
@@ -65,7 +59,7 @@ const CardsGalleryView = (props) => {
     />
   }
   const selectedPlayerData = useMemo(() => {
-    return galleryData.find(card => card.TMID === selectedCard)
+    return galleryData ? galleryData.find(card => card.TMID === selectedCard) : {}
   }, [selectedCard]);
 
   return (

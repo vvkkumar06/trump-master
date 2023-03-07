@@ -6,20 +6,15 @@ import GalleryItemComponent from '../../components/GalleryItemComponent';
 import { removeFromTeam } from '../../redux/features/team-slice';
 import { addToGallery } from '../../redux/features/gallery-slice';
 import { transformTeamCardsStateToList } from '../../redux/reducers/utils';
-import { useGetAllPlayersQuery } from '../../redux/features/cricket-slice';
+import { useCricketTeamQuery } from '../../redux/features/cricket-slice';
 const coverColor = '#ccc';
 
 const TeamView = () => {
-  const { data: playersApiData, error, isLoading } = useGetAllPlayersQuery();
-  const teamCards = useSelector((state) => state.teamCards)
+  const { data: teamCards, error, isLoading } = useCricketTeamQuery();
+
   const dispatch = useDispatch();
-  const [players, setPlayers] = useState({});
 
   const containerRefs = useRef([]);
-
-  useEffect(() => {
-    playersApiData && setPlayers(transformTeamCardsStateToList(teamCards, playersApiData));
-  }, [teamCards, playersApiData]);
 
   const getGalleryItem = (item, key) => {
     return <GalleryItemComponent
@@ -41,35 +36,35 @@ const TeamView = () => {
       }}
     />
   }
-  const { player1, player2, player3, player4, player5 } = players;
+  const { player1, player2, player3, player4, player5 } = teamCards || {};
   return (
     <View style={styles.container}>
       <Text variant="titleLarge" style={styles.teamLabel}>Edit Team</Text>
       <View style={styles.teamContainer}>
-        <View id="player-1" style={{ ...styles.cardContainer, ...styles.player1, ...(player1 && styles.borderStyleBold) }}
+        <View id="player-1" style={{ ...styles.cardContainer, ...styles.player1, ...(player1 && player1.TMID && styles.borderStyleBold) }}
           key='player-1'
           ref={(ref) => containerRefs.current['player1'] = ref}>
-          {player1 && getGalleryItem(player1, 1)}
+          {player1 && player1.TMID && getGalleryItem(player1, 1)}
         </View>
-        <View id="player-2" style={{ ...styles.cardContainer, ...styles.player2, ...(player2 && styles.borderStyleBold) }}
+        <View id="player-2" style={{ ...styles.cardContainer, ...styles.player2, ...(player2 && player2.TMID && styles.borderStyleBold) }}
           key='player-2'
           ref={(ref) => containerRefs.current['player2'] = ref}>
-          {player2 && getGalleryItem(player2, 2)}
+          {player2 && player2.TMID && getGalleryItem(player2, 2)}
         </View>
-        <View id="player-3" style={{ ...styles.cardContainer, ...styles.player3, ...(player3 && styles.borderStyleBold) }}
+        <View id="player-3" style={{ ...styles.cardContainer, ...styles.player3, ...(player3 && player3.TMID && styles.borderStyleBold) }}
           key='player-3'
           ref={(ref) => containerRefs.current['player3'] = ref}>
-          {player3 && getGalleryItem(player3, 3)}
+          {player3 && player3.TMID && getGalleryItem(player3, 3)}
         </View>
-        <View id="player-4" style={{ ...styles.cardContainer, ...styles.player4, ...(player4 && styles.borderStyleBold) }}
+        <View id="player-4" style={{ ...styles.cardContainer, ...styles.player4, ...(player5 && player4.TMID && styles.borderStyleBold) }}
           key='player-4'
           ref={(ref) => containerRefs.current['player4'] = ref}>
-          {player4 && getGalleryItem(player4, 4)}
+          {player4 && player4.TMID && getGalleryItem(player4, 4)}
         </View>
-        <View id="player-5" style={{ ...styles.cardContainer, ...styles.player5, ...(player5 && styles.borderStyleBold) }}
+        <View id="player-5" style={{ ...styles.cardContainer, ...styles.player5, ...(player5 && player5.TMID && styles.borderStyleBold) }}
           key='player-5'
           ref={(ref) => containerRefs.current['player5'] = ref}>
-          {player5 && getGalleryItem(player5, 5)}
+          {player5 && player5.TMID && getGalleryItem(player5, 5)}
         </View>
       </View>
     </View>
