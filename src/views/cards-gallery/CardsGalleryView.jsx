@@ -1,21 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import TMButton from '../../components/buttons/ButtonComponent';
 import GalleryItemComponent from '../../components/GalleryItemComponent';
-import { useCricketCollectionQuery, useCricketTeamQuery } from '../../redux/features/cricket-slice';
-import { removeFromGallery } from '../../redux/features/gallery-slice';
-import { addToTeam } from '../../redux/features/team-slice';
-import { transformGalleryCardStateToList } from '../../redux/reducers/utils';
+import { useCricketCollectionQuery } from '../../redux/features/cricket-slice';
 import { findVacantPlayer } from '../../redux/reducers/utils';
 import CardDetailsView from '../detail/CardDetailsView';
 import TeamView from '../team/TeamView';
 const coverColor = '#ccc';
 
 const CardsGalleryView = (props) => {
-  const { data: galleryData } = useCricketCollectionQuery();
-  const { data: teamCards } = useCricketTeamQuery();
+  const { data: collection } = useCricketCollectionQuery();
 
   const [selectedCard, setSelectedCard] = useState(undefined);
   const dispatch = useDispatch();
@@ -30,9 +26,9 @@ const CardsGalleryView = (props) => {
   }
 
   const renderList = () => {
-    const vacantPlayerId = teamCards && findVacantPlayer(teamCards);
+    const vacantPlayerId = collection && collection.playingCards && findVacantPlayer(collection.playingCards);
     return <FlatList
-      data={galleryData || []}
+      data={collection ? collection.backupCards : []}
       numColumns={4}
       showsVerticalScrollIndicator={false}
       ItemSeparatorComponent={() => (
@@ -49,8 +45,8 @@ const CardsGalleryView = (props) => {
             pressHandler={(id) => setSelectedCard(id)}
             canSelect={vacantPlayerId && !selectedCard ? true : false}
             animationStop={(id) => {
-              dispatch(removeFromGallery({ id }));
-              dispatch(addToTeam({ playerId: vacantPlayerId, id }));
+              // dispatch(removeFromGallery({ id }));
+              // dispatch(addToTeam({ playerId: vacantPlayerId, id }));
             }}
           />
         )
@@ -59,7 +55,7 @@ const CardsGalleryView = (props) => {
     />
   }
   const selectedPlayerData = useMemo(() => {
-    return galleryData ? galleryData.find(card => card.TMID === selectedCard) : {}
+    return collection && collection.backupCards ? collection.backupCards.find(card => card.TMID === selectedCard) : {}
   }, [selectedCard]);
 
   return (
@@ -74,7 +70,7 @@ const CardsGalleryView = (props) => {
         <SafeAreaView style={styles.container}>
           <View style={styles.galleryLeft}>
             {galleryHeader()}
-            {galleryData && galleryData.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
+            {collection && collection.backupCards && collection.backupCards.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
           </View>
           <View style={styles.galleryRight}>
             {

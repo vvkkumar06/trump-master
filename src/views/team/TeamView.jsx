@@ -1,16 +1,13 @@
-import React, { useEffect, useReducer, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import GalleryItemComponent from '../../components/GalleryItemComponent';
-import { removeFromTeam } from '../../redux/features/team-slice';
-import { addToGallery } from '../../redux/features/gallery-slice';
-import { transformTeamCardsStateToList } from '../../redux/reducers/utils';
-import { useCricketTeamQuery } from '../../redux/features/cricket-slice';
+import { useCricketCollectionQuery } from '../../redux/features/cricket-slice';
 const coverColor = '#ccc';
 
 const TeamView = () => {
-  const { data: teamCards, error, isLoading } = useCricketTeamQuery();
+  const { data: collection } = useCricketCollectionQuery();
 
   const dispatch = useDispatch();
 
@@ -22,7 +19,7 @@ const TeamView = () => {
       coverColor={coverColor}
       toLeftAnim = {true}
       longPressHandler={() => {
-        containerRefs.current[`player${key}`].setNativeProps({
+        containerRefs.current[`card${key}`].setNativeProps({
           style: {
             zIndex: 999
           }
@@ -30,41 +27,41 @@ const TeamView = () => {
 
       }}
       animationStop={() => {
-        dispatch(removeFromTeam({ playerId: key }));
-        dispatch(addToGallery({id: item.TMID}))
+        // dispatch(removeFromTeam({ playerId: key }));
+        // dispatch(addToGallery({id: item.TMID}))
         containerRefs.current[key] = undefined;
       }}
     />
   }
-  const { player1, player2, player3, player4, player5 } = teamCards || {};
+  const { card1, card2, card3, card4, card5 } = collection && collection.playingCards || {};
   return (
     <View style={styles.container}>
       <Text variant="titleLarge" style={styles.teamLabel}>Edit Team</Text>
       <View style={styles.teamContainer}>
-        <View id="player-1" style={{ ...styles.cardContainer, ...styles.player1, ...(player1 && player1.TMID && styles.borderStyleBold) }}
-          key='player-1'
-          ref={(ref) => containerRefs.current['player1'] = ref}>
-          {player1 && player1.TMID && getGalleryItem(player1, 1)}
+        <View id="card-1" style={{ ...styles.cardContainer, ...styles.card1, ...(card1 && card1.TMID && styles.borderStyleBold) }}
+          key='card-1'
+          ref={(ref) => containerRefs.current['card1'] = ref}>
+          {card1 && card1.TMID && getGalleryItem(card1, 1)}
         </View>
-        <View id="player-2" style={{ ...styles.cardContainer, ...styles.player2, ...(player2 && player2.TMID && styles.borderStyleBold) }}
-          key='player-2'
-          ref={(ref) => containerRefs.current['player2'] = ref}>
-          {player2 && player2.TMID && getGalleryItem(player2, 2)}
+        <View id="card-2" style={{ ...styles.cardContainer, ...styles.card2, ...(card2 && card2.TMID && styles.borderStyleBold) }}
+          key='card-2'
+          ref={(ref) => containerRefs.current['card2'] = ref}>
+          {card2 && card2.TMID && getGalleryItem(card2, 2)}
         </View>
-        <View id="player-3" style={{ ...styles.cardContainer, ...styles.player3, ...(player3 && player3.TMID && styles.borderStyleBold) }}
-          key='player-3'
-          ref={(ref) => containerRefs.current['player3'] = ref}>
-          {player3 && player3.TMID && getGalleryItem(player3, 3)}
+        <View id="card-3" style={{ ...styles.cardContainer, ...styles.card3, ...(card3 && card3.TMID && styles.borderStyleBold) }}
+          key='card-3'
+          ref={(ref) => containerRefs.current['card3'] = ref}>
+          {card3 && card3.TMID && getGalleryItem(card3, 3)}
         </View>
-        <View id="player-4" style={{ ...styles.cardContainer, ...styles.player4, ...(player5 && player4.TMID && styles.borderStyleBold) }}
-          key='player-4'
-          ref={(ref) => containerRefs.current['player4'] = ref}>
-          {player4 && player4.TMID && getGalleryItem(player4, 4)}
+        <View id="card-4" style={{ ...styles.cardContainer, ...styles.card4, ...(card5 && card4.TMID && styles.borderStyleBold) }}
+          key='card-4'
+          ref={(ref) => containerRefs.current['card4'] = ref}>
+          {card4 && card4.TMID && getGalleryItem(card4, 4)}
         </View>
-        <View id="player-5" style={{ ...styles.cardContainer, ...styles.player5, ...(player5 && player5.TMID && styles.borderStyleBold) }}
-          key='player-5'
-          ref={(ref) => containerRefs.current['player5'] = ref}>
-          {player5 && player5.TMID && getGalleryItem(player5, 5)}
+        <View id="card-5" style={{ ...styles.cardContainer, ...styles.card5, ...(card5 && card5.TMID && styles.borderStyleBold) }}
+          key='card-5'
+          ref={(ref) => containerRefs.current['card5'] = ref}>
+          {card5 && card5.TMID && getGalleryItem(card5, 5)}
         </View>
       </View>
     </View>
@@ -100,27 +97,27 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     borderBottomColor: 'red'
   },
-  player1: {
+  card1: {
     borderWidth: 1,
     borderColor: '#3f51b5',
     borderStyle: 'dashed'
   },
-  player2: {
+  card2: {
     borderWidth: 1,
     borderColor: '#e91e63',
     borderStyle: 'dashed'
   },
-  player3: {
+  card3: {
     borderWidth: 1,
     borderColor: '#673ab7',
     borderStyle: 'dashed'
   },
-  player4: {
+  card4: {
     borderWidth: 1,
     borderColor: '#9c27b0',
     borderStyle: 'dashed'
   },
-  player5: {
+  card5: {
     borderWidth: 1,
     borderColor: '#f44336',
     borderStyle: 'dashed'

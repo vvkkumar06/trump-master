@@ -9,10 +9,7 @@ export const cricketApi= createApi({
     cricketCollection: builder.query({
       query: () => 'collection'
     }),
-    cricketTeam: builder.query({
-      query: () => 'team'
-    }),
   }),
 })
 
-export const { useCricketCollectionQuery, useCricketTeamQuery } = cricketApi;
+export const { useCricketCollectionQuery } = cricketApi;
