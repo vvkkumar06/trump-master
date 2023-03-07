@@ -3,11 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useDispatch } from 'react-redux'
 import GalleryItemComponent from '../../components/GalleryItemComponent';
-import { useCricketCollectionQuery } from '../../redux/features/cricket-slice';
+import { useCricketCollectionQuery, useRemoveFromTeamMutation } from '../../redux/features/cricket-slice';
 const coverColor = '#ccc';
 
 const TeamView = () => {
   const { data: collection } = useCricketCollectionQuery();
+  const [ removeFromTeam, result] = useRemoveFromTeamMutation()
 
   const dispatch = useDispatch();
 
@@ -24,11 +25,9 @@ const TeamView = () => {
             zIndex: 999
           }
         })
-
       }}
-      animationStop={() => {
-        // dispatch(removeFromTeam({ playerId: key }));
-        // dispatch(addToGallery({id: item.TMID}))
+      animationStop={ async () => {
+        removeFromTeam({id: item.TMID, vacantPlayerId: `card${key}`});
         containerRefs.current[key] = undefined;
       }}
     />
@@ -53,7 +52,7 @@ const TeamView = () => {
           ref={(ref) => containerRefs.current['card3'] = ref}>
           {card3 && card3.TMID && getGalleryItem(card3, 3)}
         </View>
-        <View id="card-4" style={{ ...styles.cardContainer, ...styles.card4, ...(card5 && card4.TMID && styles.borderStyleBold) }}
+        <View id="card-4" style={{ ...styles.cardContainer, ...styles.card4, ...(card4 && card4.TMID && styles.borderStyleBold) }}
           key='card-4'
           ref={(ref) => containerRefs.current['card4'] = ref}>
           {card4 && card4.TMID && getGalleryItem(card4, 4)}

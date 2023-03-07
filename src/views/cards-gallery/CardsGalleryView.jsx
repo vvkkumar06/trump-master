@@ -4,7 +4,7 @@ import { Text } from 'react-native-paper';
 import { useDispatch } from 'react-redux'
 import TMButton from '../../components/buttons/ButtonComponent';
 import GalleryItemComponent from '../../components/GalleryItemComponent';
-import { useCricketCollectionQuery } from '../../redux/features/cricket-slice';
+import { useCricketCollectionQuery, useAddToTeamMutation } from '../../redux/features/cricket-slice';
 import { findVacantPlayer } from '../../redux/reducers/utils';
 import CardDetailsView from '../detail/CardDetailsView';
 import TeamView from '../team/TeamView';
@@ -12,7 +12,7 @@ const coverColor = '#ccc';
 
 const CardsGalleryView = (props) => {
   const { data: collection } = useCricketCollectionQuery();
-
+  const [ addToTeam, result] = useAddToTeamMutation()
   const [selectedCard, setSelectedCard] = useState(undefined);
   const dispatch = useDispatch();
 
@@ -44,9 +44,8 @@ const CardsGalleryView = (props) => {
             coverColor={coverColor}
             pressHandler={(id) => setSelectedCard(id)}
             canSelect={vacantPlayerId && !selectedCard ? true : false}
-            animationStop={(id) => {
-              // dispatch(removeFromGallery({ id }));
-              // dispatch(addToTeam({ playerId: vacantPlayerId, id }));
+            animationStop={async (id) => {
+               await addToTeam({id, vacantPlayerId});
             }}
           />
         )
