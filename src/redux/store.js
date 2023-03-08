@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { cricketApi } from './features/cricket-slice';
+import { api } from './features/api';
+import cricketCardsReducer from './features/cricket-slice';
 
 export default configureStore({
   reducer: {
-    [cricketApi.reducerPath]: cricketApi.reducer
+    [api.reducerPath]: api.reducer,
+    cricketCards: cricketCardsReducer
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(cricketApi.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),
 })

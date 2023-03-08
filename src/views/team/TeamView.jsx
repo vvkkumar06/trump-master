@@ -1,19 +1,22 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux';
 import GalleryItemComponent from '../../components/GalleryItemComponent';
-import { useCricketCollectionQuery, useRemoveFromTeamMutation } from '../../redux/features/cricket-slice';
+import { removeFromTeam } from '../../redux/features/cricket-slice';
+import { transformTeamToPlayingCards } from '../../redux/reducers/utils';
 const coverColor = '#ccc';
 
-const TeamView = () => {
-  const { data: collection } = useCricketCollectionQuery();
-  const [ removeFromTeam, result] = useRemoveFromTeamMutation()
-
+const TeamView = ({stats}) => {
+  const collection  = useSelector(state => state.cricketCards.data);
   const dispatch = useDispatch();
 
   const containerRefs = useRef([]);
 
+  const playingCards = useMemo(() => {
+    return transformTeamToPlayingCards(collection && collection.playingCards, stats);
+  }, [collection])
+  
   const getGalleryItem = (item, key) => {
     return <GalleryItemComponent
       playerData={item}
@@ -27,12 +30,12 @@ const TeamView = () => {
         })
       }}
       animationStop={ async () => {
-        removeFromTeam({id: item.TMID, vacantPlayerId: `card${key}`});
+        dispatch(removeFromTeam({tmId: item.TMID, slotId: `card${key}`}));
         containerRefs.current[key] = undefined;
       }}
     />
   }
-  const { card1, card2, card3, card4, card5 } = collection && collection.playingCards || {};
+  const { card1, card2, card3, card4, card5 } = playingCards;
   return (
     <View style={styles.container}>
       <Text variant="titleLarge" style={styles.teamLabel}>Edit Team</Text>

@@ -24,7 +24,7 @@ const GalleryItemComponent = ({
   const opacity = useRef(new Animated.Value(1)).current;
   const zIndex = useRef(new Animated.Value(0)).current;
 
-  const moveToRight = (id) => {
+  const animate = (id) => {
     setAnimInProgress(true);
     Animated.parallel([
       Animated.timing(zIndex, {
@@ -47,7 +47,7 @@ const GalleryItemComponent = ({
       resetAnimation(() => {
         setAnimInProgress(false);
         animationStop(id);
-      })
+     })
     });
   };
 
@@ -94,7 +94,7 @@ const resetAnimation = (cb) => {
             longPressHandler && longPressHandler(playerData.TMID);
             setIsLongPressed(true);
             if (canSelect) {
-              moveToRight(playerData.TMID);
+              animate(playerData.TMID);
             }
           }}
           onPressOut={() => {
@@ -187,5 +187,5 @@ const styles = StyleSheet.create({
 })
 
 
-export default GalleryItemComponent;
+export default React.memo(GalleryItemComponent);
 

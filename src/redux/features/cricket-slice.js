@@ -1,35 +1,36 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createSlice } from "@reduxjs/toolkit";
 
-export const cricketApi = createApi({
-  reducerPath: 'cricketApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: 'http://192.168.29.168:8080/api/cricket/'
-  }),
-  tagTypes: ['Cards'],
-  endpoints: (builder) => ({
-    cricketCollection: builder.query({
-      query: () => 'collection',
-      providesTags: ['Cards']
-    }),
-    addToTeam: builder.mutation({
-      query: (body) => {
-        return {
-        url: `collection/add`,
-        method: 'PATCH',
-        body
-      }},
-      invalidatesTags: ['Cards'],
-    }),
-    removeFromTeam: builder.mutation({
-      query: (body) => {
-        return {
-        url: `collection/remove`,
-        method: 'PATCH',
-        body: body
-      }},
-      invalidatesTags: ['Cards'],
-    }),
-  }),
-})
+const initialState = {}
 
-export const { useCricketCollectionQuery, useAddToTeamMutation, useRemoveFromTeamMutation } = cricketApi;
+export const cricketSlice = createSlice({
+  name: 'cricketCards',
+  initialState,
+  reducers: {
+    updateCricketCards: (state, action) => {
+      state.data = action.payload
+    },
+    //@Info action : { tmid : number, slotId: string}
+    addToTeam: (state, action) => {
+      let { backupCards, playingCards } = state.data;
+      const { tmId, slotId } = action.payload;
+      backupCards[tmId].count = backupCards[tmId].count - 1;
+      playingCards[slotId] = tmId;
+      state = { backupCards, playingCards};
+    },
+    //@Info action : { tmid : number, cardId: string}
+    removeFromTeam: (state, action) => {
+      let { backupCards, playingCards } = state.data;
+      const { tmId, slotId } = action.payload;
+      if(!backupCards[tmId]) {
+        backupCards[tmId] = {};
+      }
+      backupCards[tmId].count = backupCards[tmId].count + 1;
+      playingCards[slotId] = undefined;
+      state = { backupCards, playingCards};
+    },
+  }
+});
+
+export const { addToTeam, removeFromTeam, updateCricketCards } = cricketSlice.actions;
+
+export default cricketSlice.reducer;
