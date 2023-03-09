@@ -10,7 +10,7 @@ import CardDetailsView from '../detail/CardDetailsView';
 import TeamView from '../team/TeamView';
 const coverColor = '#ccc';
 
-const CardsGalleryView = ({stats, type}) => {
+const CardsGalleryView = ({stats, type, socket}) => {
   const collection  = useSelector(state => state.cricketCards.data);
   const [selectedCard, setSelectedCard] = useState(undefined);
   const dispatch = useDispatch();
@@ -86,6 +86,9 @@ const CardsGalleryView = ({stats, type}) => {
                     type={'success'}
                     style={styles.playNow}
                     labelStyle={styles.playNowLabel}
+                    onPressHandler={() => {
+                      socket.emit('cricket-new');
+                    }}
                   />
                 </>
 
