@@ -1,18 +1,17 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {useMemo, useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import TMButton from '../../components/buttons/ButtonComponent';
 import GalleryItemComponent from '../../components/GalleryItemComponent';
-import { useCricketCollectionQuery, useAddToTeamMutation } from '../../redux/features/cricket-slice';
-import { findVacantPlayer } from '../../redux/reducers/utils';
+import { addToTeam } from '../../redux/features/cricket-slice';
+import { findVacantPlayer, transformCollectionToList } from '../../redux/reducers/utils';
 import CardDetailsView from '../detail/CardDetailsView';
 import TeamView from '../team/TeamView';
 const coverColor = '#ccc';
 
-const CardsGalleryView = (props) => {
-  const { data: collection } = useCricketCollectionQuery();
-  const [ addToTeam, result] = useAddToTeamMutation()
+const CardsGalleryView = ({stats, type, socket}) => {
+  const collection  = useSelector(state => state.cricketCards.data);
   const [selectedCard, setSelectedCard] = useState(undefined);
   const dispatch = useDispatch();
 
@@ -25,10 +24,14 @@ const CardsGalleryView = (props) => {
     )
   }
 
+  const listData = useMemo(() => {
+    return transformCollectionToList(collection && collection.backupCards, stats);
+  }, [collection])
+
   const renderList = () => {
-    const vacantPlayerId = collection && collection.playingCards && findVacantPlayer(collection.playingCards);
+    const vacantPlayerId = collection && findVacantPlayer(collection.playingCards);
     return <FlatList
-      data={collection ? collection.backupCards : []}
+      data={listData}
       numColumns={4}
       showsVerticalScrollIndicator={false}
       ItemSeparatorComponent={() => (
@@ -45,7 +48,7 @@ const CardsGalleryView = (props) => {
             pressHandler={(id) => setSelectedCard(id)}
             canSelect={vacantPlayerId && !selectedCard ? true : false}
             animationStop={async (id) => {
-               await addToTeam({id, vacantPlayerId});
+              dispatch(addToTeam({tmId: id, slotId: vacantPlayerId}));
             }}
           />
         )
@@ -54,7 +57,7 @@ const CardsGalleryView = (props) => {
     />
   }
   const selectedPlayerData = useMemo(() => {
-    return collection && collection.backupCards ? collection.backupCards.find(card => card.TMID === selectedCard) : {}
+    return listData ? listData.find(card => card.TMID === selectedCard) : {}
   }, [selectedCard]);
 
   return (
@@ -69,7 +72,7 @@ const CardsGalleryView = (props) => {
         <SafeAreaView style={styles.container}>
           <View style={styles.galleryLeft}>
             {galleryHeader()}
-            {collection && collection.backupCards && collection.backupCards.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
+            {listData && listData.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
           </View>
           <View style={styles.galleryRight}>
             {
@@ -77,12 +80,15 @@ const CardsGalleryView = (props) => {
                 <CardDetailsView playerData={selectedPlayerData} />
               ) : (
                 <>
-                  <TeamView />
+                  <TeamView stats={stats}/>
                   <TMButton
                     label="Play Now"
                     type={'success'}
                     style={styles.playNow}
                     labelStyle={styles.playNowLabel}
+                    onPressHandler={() => {
+                      socket.emit('cricket-new');
+                    }}
                   />
                 </>
 
