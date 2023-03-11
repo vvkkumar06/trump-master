@@ -9,7 +9,6 @@ import { useSelector } from 'react-redux';
 const NavigationView = () => {
   const user = useSelector(state => state.user.data);
   const userId  = user && user.id ? user.id : undefined;
-  console.log(userId)
   const Stack = createNativeStackNavigator();
   return (
     <NavigationContainer>
