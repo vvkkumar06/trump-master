@@ -8,6 +8,8 @@ import PreGameLoaderView from './src/views/loader/pre-game/PreGameLoaderView';
 import { useEffect } from 'react';
 import { io } from "socket.io-client";
 import SocketContext from './src/utils/SocketContext';
+import LoginView from './src/views/authentication/LoginView';
+import 'expo-dev-client';
 const socket = io("http://192.168.29.168:8080");
 
 export default function App() {
@@ -39,7 +41,8 @@ export default function App() {
           <NavigationContainer>
             <Stack.Navigator screenOptions={{
               headerShown: false
-            }} initialRouteName="Dashboard">
+            }} initialRouteName="LoginView">
+              <Stack.Screen name="Login" component={LoginView} options={{ orientation: 'portrait' }}/>
               <Stack.Screen name="Dashboard" component={DashboardView} />
               <Stack.Screen name="PreGameLoader" component={PreGameLoaderView} />
             </Stack.Navigator>
