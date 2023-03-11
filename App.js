@@ -1,18 +1,17 @@
 import store from './src/redux/store';
 import { Provider } from 'react-redux'
 import { Provider as PaperProvider } from 'react-native-paper';
-import { NavigationContainer, Stack } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import DashboardView from './src/views/dashboard/DashboardView';
-import PreGameLoaderView from './src/views/loader/pre-game/PreGameLoaderView';
 import { useEffect } from 'react';
 import { io } from "socket.io-client";
 import SocketContext from './src/utils/SocketContext';
-import LoginView from './src/views/authentication/LoginView';
+
 import 'expo-dev-client';
+import NavigationView from './src/views/navigation/NavigationView';
+import { StatusBar } from 'react-native';
 const socket = io("http://192.168.29.168:8080");
 
 export default function App() {
+
   socket.on("connect", () => {
     console.log(socket.id);
   });
@@ -33,20 +32,12 @@ export default function App() {
     });
   }, []);
 
-  const Stack = createNativeStackNavigator();
   return (
     <PaperProvider>
       <Provider store={store}>
         <SocketContext.Provider value={socket}>
-          <NavigationContainer>
-            <Stack.Navigator screenOptions={{
-              headerShown: false
-            }} initialRouteName="LoginView">
-              <Stack.Screen name="Login" component={LoginView} options={{ orientation: 'portrait' }}/>
-              <Stack.Screen name="Dashboard" component={DashboardView} />
-              <Stack.Screen name="PreGameLoader" component={PreGameLoaderView} />
-            </Stack.Navigator>
-          </NavigationContainer>
+         <StatusBar hidden />
+          <NavigationView />
         </SocketContext.Provider>
       </Provider>
     </PaperProvider>
