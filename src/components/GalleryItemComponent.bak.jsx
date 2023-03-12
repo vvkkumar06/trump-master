@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   name: {
     textAlign: 'center',
     textTransform: 'uppercase',
-    fontWeight: 900,
+    fontWeight: 'bold',
     backgroundColor: '#333',
     color: '#eee',
     fontStyle: 'italic',
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     color: '#111',
     width: 40,
     height: 20,
-    fontWeight: 900,
+    fontWeight: 'bold',
     fontSize: 12,
     fontStyle: 'italic',
     textAlign: 'center'

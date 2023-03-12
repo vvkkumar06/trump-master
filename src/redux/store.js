@@ -9,5 +9,7 @@ export default configureStore({
     cricketCards: cricketCardsReducer,
     user: userReducer
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: false
+  }).concat(api.middleware),
 })

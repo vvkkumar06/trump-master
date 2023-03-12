@@ -46,7 +46,7 @@ const LoginView = () => {
       // Add your own error handler here
     }
   };
-
+ console.log('user info-', userInfo)
   return (
     <ImageBackground source={require('./../../../assets/background3.png')} resizeMode="cover" style={styles.background}>
       <SafeAreaView style={styles.container}>
@@ -70,7 +70,7 @@ const LoginView = () => {
               }}
             > Login</Button>
           </>
-        ) : ''}
+        ) : undefined}
       </SafeAreaView>
     </ImageBackground >
   );
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   logo: {
     width: 200,
