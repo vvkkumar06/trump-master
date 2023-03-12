@@ -28,11 +28,10 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
 
   const listData = useMemo(() => {
     return transformCollectionToList(collection && collection.backupCards, stats);
-  }, [collection])
+  }, [collection, stats])
 
   const renderList = () => {
     const vacantPlayerId = collection && findVacantPlayer(collection.playingCards);
-    console.log('Cards - ', listData.length);
     return <FlatList
       data={listData}
       numColumns={4}
@@ -62,7 +61,6 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
   const selectedPlayerData = useMemo(() => {
     return listData ? listData.find(card => card.TMID === selectedCard) : {}
   }, [selectedCard]);
-
   return (
     <TouchableOpacity
       onPress={() => {
