@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from 'react-native-paper';
 import colors from './../../assets/styles/_variables';
 
-const TMButton = ({label, type, icon, style, labelStyle, dark=true, onPressHandler}) => {
+const TMButton = ({label, type, icon, style, labelStyle, dark=true, onPressHandler, disabled}) => {
   return (
     <Button 
       icon={icon} 
@@ -11,6 +11,7 @@ const TMButton = ({label, type, icon, style, labelStyle, dark=true, onPressHandl
       onPress={onPressHandler} 
       buttonColor={colors[type]} 
       style ={style}
+      disabled={disabled}
       labelStyle={labelStyle}
     >
       {label}

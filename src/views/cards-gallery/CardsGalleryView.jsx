@@ -86,7 +86,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                     label="Play Now"
                     type={'success'}
                     style={styles.playNow}
-                    disabled={collection && Object.keys(collection.playingCards).length > 2}
+                    disabled={collection && Object.keys(collection.playingCards).length <= 2}
                     labelStyle={styles.playNowLabel}
                     onPressHandler={() => {
                       socket.emit('cricket-new');
