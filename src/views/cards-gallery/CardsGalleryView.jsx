@@ -61,6 +61,10 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
   const selectedPlayerData = useMemo(() => {
     return listData ? listData.find(card => card.TMID === selectedCard) : {}
   }, [selectedCard]);
+
+  const canStartPlay = useMemo(() => {
+    return collection && Object.values(JSON.parse(JSON.stringify(collection.playingCards))).length <= 2
+  }, [collection]);
   return (
     <TouchableOpacity
       onPress={() => {
@@ -86,7 +90,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                     label="Play Now"
                     type={'success'}
                     style={styles.playNow}
-                    disabled={collection && Object.keys(collection.playingCards).length <= 2}
+                    disabled={canStartPlay}
                     labelStyle={styles.playNowLabel}
                     onPressHandler={() => {
                       socket.emit('cricket-new');
