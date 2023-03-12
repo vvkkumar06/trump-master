@@ -1,11 +1,11 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ImageBackground, SafeAreaView, StatusBar, StyleSheet, View, Animated, Image, Easing } from 'react-native';
 import { Text } from 'react-native-paper';
+import { useSelector } from 'react-redux';
 import SocketContext from '../../../utils/SocketContext';
 
 const PreGameLoaderView = ({ type }) => {
   const socket = useContext(SocketContext);
-
   const [timer, setTimer] = useState(30);
   const [userDetails, setUserDetails] = useState([])
   const fontSize = useRef(new Animated.Value(15)).current;
@@ -81,7 +81,7 @@ const PreGameLoaderView = ({ type }) => {
               <View>
                 {getRippleAnimation()}
                 <View style={styles.loader}>
-                  <Text variant="displayLarge" style={{ color: 'white' }}>{timer > 0 ? timer : 0}</Text>
+                  <Text variant="displayLarge" style={{ color: 'white', marginRight: 20 }}>{timer > 0 ? timer : 0}</Text>
                   <Text variant="titleLarge" style={{ color: 'white' }}>Seaching for Opponent ...</Text>
                 </View>
               </View>
@@ -148,8 +148,7 @@ const styles = StyleSheet.create({
   loader: {
     justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'row',
-    columnGap: 20
+    flexDirection: 'row'
   },
   user: {
     marginBottom: 50,

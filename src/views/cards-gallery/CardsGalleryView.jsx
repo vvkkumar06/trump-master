@@ -65,6 +65,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
   const canStartPlay = useMemo(() => {
     return collection && Object.values(JSON.parse(JSON.stringify(collection.playingCards))).length <= 2
   }, [collection]);
+  
   return (
     <TouchableOpacity
       onPress={() => {

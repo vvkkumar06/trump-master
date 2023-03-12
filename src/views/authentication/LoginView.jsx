@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, ImageBackground, View, Image } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
@@ -8,13 +8,11 @@ import { useDispatch } from 'react-redux';
 import { setUserDetails } from '../../redux/features/user-slice';
 
 //614960213278-9j7hiauqfg9gibauk358r9cc14avh3mb.apps.googleusercontent.com
-WebBrowser.maybeCompleteAuthSession();
 const LoginView = () => {
-  const [token, setToken] = useState("");
   const [userInfo, setUserInfo] = useState(null);
   const dispatch = useDispatch()
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
+  const [request, response, promptAsync] =  Google.useAuthRequest({
     androidClientId: "614960213278-9j7hiauqfg9gibauk358r9cc14avh3mb.apps.googleusercontent.com",
     expoClientId: '614960213278-9j7hiauqfg9gibauk358r9cc14avh3mb.apps.googleusercontent.com',
     webClientId: '614960213278-3f6metee1kgd1fv1a62n9q2l9so73kjm.apps.googleusercontent.com'
@@ -24,21 +22,20 @@ const LoginView = () => {
 
   useEffect(() => {
     if (response?.type === "success") {
-      setToken(response.authentication.accessToken);
-      getUserInfo();
+      getUserInfo(response.authentication.accessToken);
     }
-  }, [response, token]);
-
-  const getUserInfo = async () => {
+  }, [response]);
+  
+  const getUserInfo = async (token) => {
     try {
       const response = await fetch(
         "https://www.googleapis.com/userinfo/v2/me",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
-      );
-
-      const user = await response.json();
+        );
+        
+        const user = await response.json();
 
       setUserInfo(user);
       dispatch(setUserDetails(user))
@@ -46,7 +43,6 @@ const LoginView = () => {
       // Add your own error handler here
     }
   };
- console.log('user info-', userInfo)
   return (
     <ImageBackground source={require('./../../../assets/background3.png')} resizeMode="cover" style={styles.background}>
       <SafeAreaView style={styles.container}>
