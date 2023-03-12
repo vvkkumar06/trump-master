@@ -2,6 +2,7 @@
   "expo": {
     "name": "trump-master",
     "slug": "trump-master",
+    "scheme": "trumpmaster",
     "version": "1.0.0",
     "orientation": "landscape",
     "icon": "./assets/icon.png",
@@ -15,9 +16,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vijyo.tm"
     },
     "android": {
+      "package": "com.vijyo.tm",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -25,6 +28,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c7bccbb1-0d21-4230-a2db-1c8294312999"
+      }
     }
   }
 }

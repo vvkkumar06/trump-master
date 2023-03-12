@@ -3,14 +3,14 @@ import { Image, Animated, TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 
-const GalleryItemComponent = ({ 
-  playerData, 
+const GalleryItemComponent = ({
+  playerData,
   coverColor,
-  pressHandler, 
-  pressOutHandler, 
-  canSelect = true, 
-  animationStop, 
-  longPressHandler, 
+  pressHandler,
+  pressOutHandler,
+  canSelect = true,
+  animationStop,
+  longPressHandler,
   toLeftAnim }) => {
   const [isLongPressed, setIsLongPressed] = useState(false);
   const [animInProgress, setAnimInProgress] = useState(false);
@@ -47,42 +47,42 @@ const GalleryItemComponent = ({
       resetAnimation(() => {
         setAnimInProgress(false);
         animationStop(id);
-     })
+      })
     });
   };
 
-const resetAnimation = (cb) => {
-  Animated.parallel([
-    Animated.timing(zIndex, {
-      toValue: 0,
-      duration: 0,
-      useNativeDriver: false
-    }),
-    Animated.timing(opacity, {
-      toValue: 0,
-      duration: 0,
-      useNativeDriver: false
-    }),
-    Animated.timing(position, {
-      toValue: { x: 0, y: 0 },
-      duration: 0,
-      useNativeDriver: false
-    }
-    )
-  ]).start(() => {
-    cb()
-  });
-}
+  const resetAnimation = (cb) => {
+    Animated.parallel([
+      Animated.timing(zIndex, {
+        toValue: 0,
+        duration: 0,
+        useNativeDriver: false
+      }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 0,
+        useNativeDriver: false
+      }),
+      Animated.timing(position, {
+        toValue: { x: 0, y: 0 },
+        duration: 0,
+        useNativeDriver: false
+      }
+      )
+    ]).start(() => {
+      cb()
+    });
+  }
 
   const renderItem = () => {
 
     return (
       <Animated.View {...((isLongPressed || animInProgress) && {
         style: [
-          { transform: position.getTranslateTransform()},
+          { transform: position.getTranslateTransform() },
           {
             zIndex: zIndex,
-            opacity: opacity
+            opacity: opacity,
           }
         ]
       })}>
@@ -101,7 +101,7 @@ const resetAnimation = (cb) => {
             setIsLongPressed(false);
           }}
         >
-          <Card key={playerData.TMID} style={{ ...styles.container, ...(isLongPressed && styles.longPress), ...(!canSelect && isLongPressed && styles.canSelect)}} >
+          <Card key={playerData.TMID} style={{ ...styles.container, ...(isLongPressed && styles.longPress), ...(!canSelect && isLongPressed && styles.canSelect) }} >
             <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor }} resizeMode='contain' />
             <Text style={styles.name}>{name}</Text>
             <Text style={styles.id}>C#{playerData.TMID}</Text>
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   name: {
     textAlign: 'center',
     textTransform: 'uppercase',
-    fontWeight: 900,
+    fontWeight: 'bold',
     backgroundColor: '#333',
     color: '#eee',
     fontStyle: 'italic',
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     color: '#111',
     width: 40,
     height: 20,
-    fontWeight: 900,
+    fontWeight: 'bold',
     fontSize: 12,
     fontStyle: 'italic',
     textAlign: 'center'

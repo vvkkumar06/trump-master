@@ -13,7 +13,7 @@ const PlayerComponent = ({ displayProps, playerData, coverColor }) => (
     <Text style={styles.id}>C#{playerData.TMID}</Text>
     <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor, borderRadius: 0 }} resizeMode='contain' />
     <Text style={{
-      textAlign: 'center', textTransform: 'uppercase', fontWeight: 900,
+      textAlign: 'center', textTransform: 'uppercase', fontWeight: 'bold',
       backgroundColor: '#333', color: '#eee', fontStyle: 'italic'
     }}>{playerData.PlayerName}</Text>
     <View style={{
@@ -29,7 +29,7 @@ const PlayerComponent = ({ displayProps, playerData, coverColor }) => (
               flexDirection: 'row', marginBottom: 2, borderWidth: 1, borderColor: '#666'
             }} key={key}>
               <Text variant="labelSmall" style={{
-                width: '50%', fontWeight: 900,
+                width: '50%', fontWeight: 'bold',
                 backgroundColor: '#333',
                 color: '#eee'
               }}> {displayProps[key]} </Text>
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     color: '#111',
     width: 100,
     height: 40,
-    fontWeight: 900,
+    fontWeight: 'bold',
     fontSize: 24,
     fontStyle: 'italic',
     textAlign: 'center',
