@@ -95,7 +95,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                     labelStyle={styles.playNowLabel}
                     onPressHandler={() => {
                       socket.emit('cricket-new');
-                      navigation.navigate('PreGameLoader');
+                      navigation.navigate('GameView');
                     }}
                   />
                 </>

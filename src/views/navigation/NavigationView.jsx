@@ -8,6 +8,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 import { useSelector } from 'react-redux';
 import SocketContext from '../../utils/SocketContext';
+import GameView from '../game/GameView';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -46,6 +47,7 @@ const NavigationView = () => {
             <>
               <Stack.Screen name="Dashboard" component={DashboardView} options={{ orientation: 'landscape'}}/>
               <Stack.Screen name="PreGameLoader" component={PreGameLoaderView} options={{ orientation: 'landscape' }}/>
+              <Stack.Screen name="GameView" component={GameView} options={{ orientation: 'landscape' }}/>
             </>
         }
 

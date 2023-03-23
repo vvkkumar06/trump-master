@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { ImageBackground, SafeAreaView, StatusBar, StyleSheet, View, Animated, Image, Easing } from 'react-native';
-import { Text } from 'react-native-paper';
-import { useSelector } from 'react-redux';
+import { ImageBackground, SafeAreaView, StatusBar,Image, StyleSheet, View, Animated, Easing } from 'react-native';
+import { Text, Avatar } from 'react-native-paper';
 import SocketContext from '../../../utils/SocketContext';
 
 const PreGameLoaderView = ({ type }) => {
@@ -88,14 +87,16 @@ const PreGameLoaderView = ({ type }) => {
             ) :
               (
                 <View style={{ flexDirection: 'row', width: 800 }}>
-                  <View style={{ width: 350, paddingRight: 30 }}>
-                    <Animated.Text variant='headlineSmall' style={[styles.user, { textAlign: 'right', fontSize, color: '#a2cf6e', opacity: colorOpacity }]}>{userDetails[0].name}</Animated.Text>
+                  <View style={{ width: 350, alignItems: 'center'}}>
+                    <Avatar.Image size={100} style={{ alignSelf: 'center'}} source={{uri: userDetails[0].picture}} />
+                    <Animated.Text variant='headlineSmall' style={[styles.user, {  fontSize, color: '#a2cf6e', opacity: colorOpacity }]}>{userDetails[0].name}</Animated.Text>
                   </View>
                   <View style={{ width: 100 }}>
                     <Text variant='displayLarge' style={styles.vs}>Vs</Text>
                   </View>
-                  <View style={{ width: 350 }}>
-                    <Animated.Text variant='headlineSmall' style={[styles.user, { textAlign: 'left', fontSize, color: '#ff9800', opacity: colorOpacity }]}>{userDetails[1].name}</Animated.Text>
+                  <View style={{ width: 350, alignItems: 'center' }}>
+                    <Avatar.Image size={100} style={{ alignSelf: 'center'}} source={{uri: userDetails[1].picture}} />
+                    <Animated.Text variant='headlineSmall' style={[styles.user, { fontSize, color: '#ff9800', opacity: colorOpacity }]}>{userDetails[1].name}</Animated.Text>
                   </View>
                 </View>
               )
@@ -168,6 +169,10 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 5, height: 5 },
     textShadowRadius: 10
+  }, playerImg: {
+    width: 200,
+    height: 200,
+    borderRadius: 200 / 2
   }
 })
 

@@ -3,19 +3,27 @@ import { Image, StyleSheet } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 import { View } from 'react-native';
 
-const PlayerComponent = ({ displayProps, playerData, coverColor }) => (
+const getShortName = (name) => {
+  name = name.split(' ');
+  let fName = name[0].substr(0, 1);
+  let lName = name[1];
+  return `${fName} ${lName}`;
+};
+
+const PlayerComponent = ({ displayProps, playerData, coverColor, textWrapperStyle,topStyle,textStyle, idStyle, textVariant="labelSmall", imageStyle, cardCoverStyle, useShortName }) => (
+  
   <Card elevated key={playerData.PlayerName} style={styles.container} >
-    <View style={styles.topLeftBox} />
+    <View style={[styles.topLeftBox, topStyle]} />
     <Image
-      style={styles.logo}
+      style={[styles.logo, imageStyle]}
       source={require('./../../assets/images/app-icons/logo.png')}
     />
-    <Text style={styles.id}>C#{playerData.TMID}</Text>
-    <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor, borderRadius: 0 }} resizeMode='contain' />
+    <Text style={[styles.id, idStyle]}>C#{playerData.TMID}</Text>
+    <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor, borderRadius: 0, ...cardCoverStyle }} resizeMode='contain' />
     <Text style={{
       textAlign: 'center', textTransform: 'uppercase', fontWeight: 'bold',
       backgroundColor: '#333', color: '#eee', fontStyle: 'italic'
-    }}>{playerData.PlayerName}</Text>
+    }}>{!useShortName ? playerData.PlayerName : getShortName(playerData.PlayerName)}</Text>
     <View style={{
       justifyContent: 'space-between', flexDirection: 'row',
       padding: 0, flexWrap: 'wrap'
@@ -26,16 +34,19 @@ const PlayerComponent = ({ displayProps, playerData, coverColor }) => (
           return (
             <View style={{
               justifyContent: 'space-between', width: '50%',
-              flexDirection: 'row', marginBottom: 2, borderWidth: 1, borderColor: '#666'
+              flexDirection: 'row', marginBottom: 2, borderWidth: 1, borderColor: '#666',
+              ...(textWrapperStyle && textWrapperStyle)
             }} key={key}>
-              <Text variant="labelSmall" style={{
+              <Text variant={textVariant} style={{
                 width: '50%', fontWeight: 'bold',
                 backgroundColor: '#333',
-                color: '#eee'
+                color: '#eee', ...(textStyle && textStyle)
               }}> {displayProps[key]} </Text>
-              <Text variant="labelSmall" style={{
+              <Text variant={textVariant} style={{
                 textAlign: 'center', fontSize: 10,
-                width: '50%', borderWidth: 1, borderColor: '#ccc'
+                width: '50%', borderWidth: 1, borderColor: '#ccc',
+                backgroundColor: '#ddd',
+                ...(textStyle && textStyle)
               }} >{playerData[key] ? playerData[key] : '-'} </Text>
             </View>)
         }) : []
