@@ -72,6 +72,7 @@ const CardDetailsView = ({playerData}) => {
       displayProps={CricketPlayerDisplayProps}
       coverColor = '#ccc'
       playerData ={playerData}
+      height="280"
       />
     </Animated.View >
    

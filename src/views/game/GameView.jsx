@@ -1,19 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, ImageBackground, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import PlayerComponent from '../../components/PlayerComponent';
 import { transformTeamToPlayingCards } from '../../redux/reducers/utils';
 import { CricketPlayerDisplayProps } from '../../utils/display-properties';
 import { useFetchStatsQuery } from '../../redux/features/api';
-const cardCommonProps = {
-  textStyle: { fontSize: 6, margin: 0, fontWeight: 'bold' },
-  textVariant: false,
-  textWrapperStyle: { height: 12, marginBottom: 0 },
-  cardCoverStyle: { height: 50, width: 100 },
-  idStyle: { fontSize: 15, height: 20, width: 50, top: 35 },
-  topStyle: { width: 80, height: 10 }
-}
+
 const GameView = () => {
   const [isOut, setIsOut] = useState(false);
   const { data: stats } = useFetchStatsQuery();
@@ -43,18 +36,21 @@ const GameView = () => {
 
 
   const getPlayerCards = (data, pos, cardName) => {
+  
     if (data) {
-      return <Animated.View key={cardName} style={[styles.cardContainer, { bottom: pos }]} >
+      return (
+      <Animated.View key={cardName} style={[styles.cardContainer, { bottom: pos }]} >
         <TouchableOpacity onPress={() => moveCardUp(pos, isOut)} activeOpacity={1} >
           <PlayerComponent
             displayProps={CricketPlayerDisplayProps}
             coverColor='#ccc'
             playerData={data || {}}
-            {...cardCommonProps}
             useShortName={true}
+            height="160"
           />
         </TouchableOpacity>
       </Animated.View>
+      )
     }
   }
 
@@ -96,7 +92,11 @@ const styles = StyleSheet.create({
   },
   selectedContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    borderWidth: 2,
+    borderStyle: 'dotted',
+    width: 110,
+    height: 160
   }, player1SelectedContainer: {
     width: 150,
     height: 250
@@ -106,13 +106,14 @@ const styles = StyleSheet.create({
     height: 250
   },
   cardContainer: {
-    width: 100,
-    height: 150,
-    margin: 2
+    width: 110,
+    margin: 2,
+    height: 160
   },
   cardsContainer: {
     position: 'absolute',
-    bottom: -80,
+    display: 'flex',
+    bottom: -82,
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'center',
