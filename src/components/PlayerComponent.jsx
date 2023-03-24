@@ -6,12 +6,18 @@ import { transform } from 'lodash';
 
 const getShortName = (name) => {
   name = name.split(' ');
-  let fName = name[0].substr(0, 1);
-  let lName = name[1];
-  if(name.length === 3) {
-    lName += ' ' + name[2];
+
+  if(name.length > 1) {
+
+    let fName = name[0].substr(0, 1);
+    let lName = name[1];
+    if(name.length === 3) {
+      lName += ' ' + name[2];
+    }
+    return `${fName} ${lName}`;
+  } else {
+    return name;
   }
-  return `${fName} ${lName}`;
 };
 const getFontSize = (height, ref) =>  Math.floor((ref/280)*height);
 
