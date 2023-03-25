@@ -12,6 +12,7 @@ import { CricketPlayerDisplayProps } from '../../utils/display-properties';
 const GameView = () => {
   const [player1, setPlayer1] = useState(undefined);
   const [player2, setPlayer2] = useState(undefined);
+  const [result, setResult] = useState(undefined);
   const { data: stats } = useFetchStatsQuery();
   const collection = useSelector(state => state.cricketCards.data);
   const [disableDrag, setDisableDrag] = useState(false);
@@ -34,7 +35,6 @@ const GameView = () => {
     setDisableDrag(true);
   }
 
-  // console.log(disableDrag);
   return (
     <ImageBackground source={require('./../../../assets/background1.png')} resizeMode="cover" style={styles.background}>
       <SafeAreaView style={styles.container}>
@@ -59,6 +59,11 @@ const GameView = () => {
             }
 
           </View>
+          <View>
+            <Text>
+              {result === 'clientId' ? 'You Win' : 'You Lose'}
+            </Text>
+          </View>
           <View style={styles.player2SelectedContainer}>
             <Text>
               Opponent
@@ -66,11 +71,11 @@ const GameView = () => {
           </View>
         </View>
         <View style={styles.cardsContainer}>
-          <PlayingCard data={card1} cardName="card1" onCardDrop={handleCardDrop} isDragDisabled={disableDrag}/>
-          <PlayingCard data={card2} cardName="card2" onCardDrop={handleCardDrop} isDragDisabled={disableDrag}/>
-          <PlayingCard data={card3} cardName="card3" onCardDrop={handleCardDrop} isDragDisabled={disableDrag}/>
-          <PlayingCard data={card4} cardName="card4" onCardDrop={handleCardDrop} isDragDisabled={disableDrag}/>
-          <PlayingCard data={card5} cardName="card5" onCardDrop={handleCardDrop} isDragDisabled={disableDrag}/>
+          <PlayingCard data={card1} cardName="card1" onCardDrop={handleCardDrop} isDragDisabled={disableDrag} />
+          <PlayingCard data={card2} cardName="card2" onCardDrop={handleCardDrop} isDragDisabled={disableDrag} />
+          <PlayingCard data={card3} cardName="card3" onCardDrop={handleCardDrop} isDragDisabled={disableDrag} />
+          <PlayingCard data={card4} cardName="card4" onCardDrop={handleCardDrop} isDragDisabled={disableDrag} />
+          <PlayingCard data={card5} cardName="card5" onCardDrop={handleCardDrop} isDragDisabled={disableDrag} />
         </View>
 
       </SafeAreaView>

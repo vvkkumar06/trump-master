@@ -1,5 +1,6 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Text } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux'
 import TMButton from '../../components/buttons/ButtonComponent';
@@ -13,10 +14,24 @@ const coverColor = '#ccc';
 
 const CardsGalleryView = ({ stats, type, navigation }) => {
   const collection = useSelector(state => state.cricketCards.data);
+  const clientInfo = useSelector(state => state.user.data);
+
   const socket = useContext(SocketContext);
   const [selectedCard, setSelectedCard] = useState(undefined);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    socket.on("show-preload", (args, cb) => {
+      if(args) {
+        Toast.show({
+          type: 'error',
+          text1: args.error
+        })
+      } else {
+        navigation.navigate('PreGameLoader');
+      }
+    });
+  }, []);
 
   const galleryHeader = () => {
     return (
@@ -51,7 +66,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                 dispatch(addToTeam({ tmId: id, slotId: vacantPlayerId }));
               }}
             />
-             <View style={{ width: 9 }} />
+            <View style={{ width: 9 }} />
           </>
         )
       }}
@@ -65,7 +80,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
   const canStartPlay = useMemo(() => {
     return collection && Object.values(JSON.parse(JSON.stringify(collection.playingCards))).length <= 2
   }, [collection]);
-  
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -94,8 +109,12 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                     disabled={canStartPlay}
                     labelStyle={styles.playNowLabel}
                     onPressHandler={() => {
-                      socket.emit('cricket-new');
-                      navigation.navigate('GameView');
+                      socket.emit('new-game', {
+                        gameState: {
+                          availableCards: Object.values(collection.playingCards)
+                        },
+                        clientInfo
+                      });
                     }}
                   />
                 </>

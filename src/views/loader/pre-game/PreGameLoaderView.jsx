@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { BackHandler } from 'react-native';
 import { ImageBackground, SafeAreaView, StatusBar,Image, StyleSheet, View, Animated, Easing } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
 import SocketContext from '../../../utils/SocketContext';
@@ -10,13 +11,17 @@ const PreGameLoaderView = ({ type }) => {
   const fontSize = useRef(new Animated.Value(15)).current;
   const colorOpacity = useRef(new Animated.Value(0.5)).current;
   useEffect(() => {
-    socket.on("pre-game", (args, cb) => {
-      setUserDetails(args);
+    socket.on("start-game", (args, cb) => {
+      setUserDetails(args.players)
     });
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
+    return () => {
+      backHandler.remove();
+    }
   }, []);
 
   useEffect(() => {
-    if (userDetails[0] && userDetails[1]) {
+    if (userDetails[1] && userDetails[2]) {
       animateUserText();
     }
   }, [userDetails])
@@ -76,7 +81,7 @@ const PreGameLoaderView = ({ type }) => {
       <SafeAreaView style={styles.container}>
         <View style={styles.loaderContainer}>
           {
-            !(userDetails && userDetails[0] && userDetails && userDetails[1]) ? (
+            !(userDetails && userDetails[1] && userDetails[2]) ? (
               <View>
                 {getRippleAnimation()}
                 <View style={styles.loader}>
@@ -88,15 +93,15 @@ const PreGameLoaderView = ({ type }) => {
               (
                 <View style={{ flexDirection: 'row', width: 800 }}>
                   <View style={{ width: 350, alignItems: 'center'}}>
-                    <Avatar.Image size={100} style={{ alignSelf: 'center'}} source={{uri: userDetails[0].picture}} />
-                    <Animated.Text variant='headlineSmall' style={[styles.user, {  fontSize, color: '#a2cf6e', opacity: colorOpacity }]}>{userDetails[0].name}</Animated.Text>
+                    <Avatar.Image size={100} style={{ alignSelf: 'center'}} source={{uri: userDetails[1]['clientInfo'].picture}} />
+                    <Animated.Text variant='headlineSmall' style={[styles.user, {  fontSize, color: '#a2cf6e', opacity: colorOpacity }]}>{userDetails[1].clientInfo.name}</Animated.Text>
                   </View>
                   <View style={{ width: 100 }}>
                     <Text variant='displayLarge' style={styles.vs}>Vs</Text>
                   </View>
                   <View style={{ width: 350, alignItems: 'center' }}>
-                    <Avatar.Image size={100} style={{ alignSelf: 'center'}} source={{uri: userDetails[1].picture}} />
-                    <Animated.Text variant='headlineSmall' style={[styles.user, { fontSize, color: '#ff9800', opacity: colorOpacity }]}>{userDetails[1].name}</Animated.Text>
+                    <Avatar.Image size={100} style={{ alignSelf: 'center'}} source={{uri: userDetails[2]['clientInfo'].picture}} />
+                    <Animated.Text variant='headlineSmall' style={[styles.user, { fontSize, color: '#ff9800', opacity: colorOpacity }]}>{userDetails[2].clientInfo.name}</Animated.Text>
                   </View>
                 </View>
               )
