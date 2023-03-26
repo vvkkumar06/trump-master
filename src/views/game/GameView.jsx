@@ -19,6 +19,7 @@ const GameView = () => {
   const [gameState, setGameState] =useState(undefined);
   const [result, setResult] = useState(undefined);
   const { data: stats } = useFetchStatsQuery();
+  const [roundQuestion, setRoundQuestion] = useState('');
   const [disableDrag, setDisableDrag] = useState(false);
 
   useEffect(() =>{
@@ -26,7 +27,9 @@ const GameView = () => {
     socket.on('game-status',(args) => {
       setGameState(args);
     });
-    socket.on('request-move',({nextRound}) => {
+    socket.on('request-move',({nextRound, roundInfo}) => {
+      console.log(roundInfo)
+      setRoundQuestion(Object.values(roundInfo.question)[0]);
       setNextRound(nextRound);
     });
 
@@ -43,6 +46,17 @@ const GameView = () => {
       if(removeCard) {
         cards[removeCard] = undefined;
       }
+      // console.log(gameState[socket.id]);
+      if(gameState[socket.id].result) {
+        if(gameState[socket.id].result[nextRound] === 'W') {
+          setResult('You Won!');
+        } else if(gameState[socket.id].result[nextRound] === 'T') {
+          setResult('Match Tied!')
+        } else if(gameState[socket.id].result[nextRound] === 'L'){
+          setResult('You Lost!')
+        }
+      }
+    
       return cards;
     } else {
       return {};
@@ -95,7 +109,7 @@ const GameView = () => {
           </View>
           <View>
             <Text>
-              {result === 'clientId' ? 'You Win' : 'You Lose'}
+              {result ? result : roundQuestion}
             </Text>
           </View>
           <View style={styles.player2SelectedContainer}>
