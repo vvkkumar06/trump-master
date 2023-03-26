@@ -1,15 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { Animated, Easing, PanResponder, TouchableOpacity } from 'react-native';
 import PlayerComponent from '../../components/PlayerComponent';
 import { CricketPlayerDisplayProps } from '../../utils/display-properties';
 import styles from './gameViewStyles';
 
-const PlayingCard = ({ data, cardName, onCardDrop, isDragDisabled }) => {
+const PlayingCard = ({onCardDrop, data, cardName, onDragStart, isDragDisabled }) => {
     const [isOut, setIsOut] = useState(false);
     const pan = useRef(new Animated.ValueXY({ x: 0, y: -5 })).current;
     
-    const panResponder = useRef(PanResponder.create({
+    const panResponder = useMemo(() => PanResponder.create({
         onPanResponderGrant: (evt, gestureState) => {
+            onDragStart && onDragStart();
             setIsOut(false);
             pan.setOffset({ x: 0, y: pan.y._value })
         },
@@ -37,7 +38,7 @@ const PlayingCard = ({ data, cardName, onCardDrop, isDragDisabled }) => {
 
         }
 
-    })).current;
+    }), [data, cardName]);
 
 
     const moveCardUp = () => {

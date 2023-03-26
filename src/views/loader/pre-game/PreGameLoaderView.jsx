@@ -4,14 +4,14 @@ import { ImageBackground, SafeAreaView, StatusBar,Image, StyleSheet, View, Anima
 import { Text, Avatar } from 'react-native-paper';
 import SocketContext from '../../../utils/SocketContext';
 
-const PreGameLoaderView = ({ type }) => {
+const PreGameLoaderView = ({ type, navigation }) => {
   const socket = useContext(SocketContext);
   const [timer, setTimer] = useState(30);
   const [userDetails, setUserDetails] = useState([])
   const fontSize = useRef(new Animated.Value(15)).current;
   const colorOpacity = useRef(new Animated.Value(0.5)).current;
   useEffect(() => {
-    socket.on("start-game", (args, cb) => {
+    socket.on("load-game", (args, cb) => {
       setUserDetails(args.players)
     });
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
@@ -63,7 +63,9 @@ const PreGameLoaderView = ({ type }) => {
         easing: Easing.ease,
         useNativeDriver: false
       })
-    ]).start()
+    ]).start(() => {
+      navigation.navigate('GameView')
+    })
   }
 
   const getRippleAnimation = () => {

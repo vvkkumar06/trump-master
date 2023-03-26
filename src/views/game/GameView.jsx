@@ -1,35 +1,69 @@
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ImageBackground, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native';
 import { useSelector } from 'react-redux';
-import { transformTeamToPlayingCards } from '../../redux/reducers/utils';
+import { getCardDetailsFromTmId, transformTeamToPlayingCards } from '../../redux/reducers/utils';
 import { useFetchStatsQuery } from '../../redux/features/api';
 import styles from './gameViewStyles';
 import PlayingCard from './PlayingCard';
 import PlayerComponent from '../../components/PlayerComponent';
 import { CricketPlayerDisplayProps } from '../../utils/display-properties';
+import SocketContext from '../../utils/SocketContext';
 
 const GameView = () => {
+  const socket = useContext(SocketContext);
   const [player1, setPlayer1] = useState(undefined);
-  const [player2, setPlayer2] = useState(undefined);
+  const [player2Move, setPlayer2Move] = useState(undefined);
+  const [nextRound, setNextRound] = useState(undefined);
+  const [removeCard, setRemoveCard] = useState(undefined);
+  const [gameState, setGameState] =useState(undefined);
   const [result, setResult] = useState(undefined);
   const { data: stats } = useFetchStatsQuery();
-  const collection = useSelector(state => state.cricketCards.data);
   const [disableDrag, setDisableDrag] = useState(false);
 
+  useEffect(() =>{
+    socket.emit('start-game');
+    socket.on('game-status',(args) => {
+      setGameState(args);
+    });
+    socket.on('request-move',({nextRound}) => {
+      setNextRound(nextRound);
+    });
+
+  }, [])
 
   const playingCards = useMemo(() => {
-    return transformTeamToPlayingCards(collection && collection.playingCards, stats);
-  }, [collection])
+    if(gameState && nextRound) {
+      const player2Id = Object.keys(gameState).find(client => client !== socket.id);
+      if(gameState[player2Id].move) {
+        const player2Card = getCardDetailsFromTmId(gameState[player2Id].move, stats);
+        setPlayer2Move(player2Card);
+      }
+      const cards = transformTeamToPlayingCards(gameState && gameState[socket.id] && gameState[socket.id].availableCards, stats);
+      if(removeCard) {
+        cards[removeCard] = undefined;
+      }
+      return cards;
+    } else {
+      return {};
+    }
+  }, [gameState, nextRound, removeCard])
 
   const { card1, card2, card3, card4, card5 } = playingCards;
 
   const handleCardDrop = (card, cardName) => {
     // Set selected player
     setPlayer1(card);
-
+    setRemoveCard(cardName);
+    let availableCards = {};
+     Object.keys(playingCards).forEach(name =>{
+      availableCards[name] = playingCards[name] ? playingCards[name].TMID : undefined;
+    })
+    socket.emit('move', {
+      availableCards,
+      move: card.TMID
+    });
     //removed card from deck
-    playingCards[cardName] = undefined;
 
     //disable drag
     setDisableDrag(true);
@@ -65,9 +99,23 @@ const GameView = () => {
             </Text>
           </View>
           <View style={styles.player2SelectedContainer}>
-            <Text>
-              Opponent
-            </Text>
+          {
+              player2Move ? (
+                <View key={'player2'} style={[styles.cardContainer]} >
+                  <PlayerComponent
+                    displayProps={CricketPlayerDisplayProps}
+                    coverColor='#ccc'
+                    playerData={player2Move || {}}
+                    useShortName={true}
+                    height="160"
+                  />
+                </View>
+              ) : (
+                <Text>
+                  Opponent
+                </Text>
+              )
+            }
           </View>
         </View>
         <View style={styles.cardsContainer}>

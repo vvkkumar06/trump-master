@@ -41,7 +41,7 @@ const NavigationView = () => {
       <Stack.Navigator screenOptions={{ headerShown: false, headerShown: false}} initialRouteName={!userId ? "LoginView" : "Dashboard"}>
         {
          !userId ? <>
-            <Stack.Screen name="Login" component={LoginView} options={{ orientation: 'portrait' }} />
+            <Stack.Screen name="Login" component={LoginView} />
 
           </> :
             <>

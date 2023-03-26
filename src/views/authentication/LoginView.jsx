@@ -15,8 +15,8 @@ const LoginView = () => {
   const [request, response, promptAsync] =  Google.useAuthRequest({
     androidClientId: "614960213278-9j7hiauqfg9gibauk358r9cc14avh3mb.apps.googleusercontent.com",
     expoClientId: '614960213278-9j7hiauqfg9gibauk358r9cc14avh3mb.apps.googleusercontent.com',
-    webClientId: '614960213278-3f6metee1kgd1fv1a62n9q2l9so73kjm.apps.googleusercontent.com'
-    // iosClientId: "GOOGLE_GUID.apps.googleusercontent.com",
+    webClientId: '614960213278-3f6metee1kgd1fv1a62n9q2l9so73kjm.apps.googleusercontent.com',
+    iosClientId: "614960213278-v2rel582l0q8u6coi351cp8j7q6hdpn1.apps.googleusercontent.com",
 
   });
 

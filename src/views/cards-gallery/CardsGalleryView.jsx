@@ -111,7 +111,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                     onPressHandler={() => {
                       socket.emit('new-game', {
                         gameState: {
-                          availableCards: Object.values(collection.playingCards)
+                          availableCards: collection.playingCards
                         },
                         clientInfo
                       });

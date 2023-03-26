@@ -5,9 +5,9 @@ import { View } from 'react-native';
 import { transform } from 'lodash';
 
 const getShortName = (name) => {
-  name = name.split(' ');
+  name = name && name.split(' ');
 
-  if(name.length > 1) {
+  if(name && name.length > 1) {
 
     let fName = name[0].substr(0, 1);
     let lName = name[1];
