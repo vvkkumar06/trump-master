@@ -4,7 +4,7 @@ import PlayerComponent from '../../components/PlayerComponent';
 import { CricketPlayerDisplayProps } from '../../utils/display-properties';
 import styles from './gameViewStyles';
 
-const PlayingCard = ({onCardDrop, data, cardName, onDragStart, isDragDisabled }) => {
+const PlayingCard = ({onCardDrop, data, cardName, onDragStart, isDragDisabled, gameState, playingCards }) => {
     const [isOut, setIsOut] = useState(false);
     const pan = useRef(new Animated.ValueXY({ x: 0, y: -5 })).current;
     
@@ -23,7 +23,7 @@ const PlayingCard = ({onCardDrop, data, cardName, onDragStart, isDragDisabled })
         },
         onPanResponderRelease: (e, gestureState) => {
             if (gestureState.moveX < 90 && gestureState.moveY < 130) {
-                onCardDrop && onCardDrop(data, cardName);
+                onCardDrop && onCardDrop(data, cardName, gameState, playingCards);
             } else {
                 pan.setOffset({ x: 0, y: 0 })
                 Animated.spring(
@@ -38,7 +38,7 @@ const PlayingCard = ({onCardDrop, data, cardName, onDragStart, isDragDisabled })
 
         }
 
-    }), [data, cardName]);
+    }), [data, cardName, gameState, playingCards]);
 
 
     const moveCardUp = () => {
