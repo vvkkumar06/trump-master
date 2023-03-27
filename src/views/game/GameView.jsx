@@ -25,10 +25,10 @@ const GameView = () => {
   useEffect(() =>{
     socket.emit('start-game');
     socket.on('game-status',(args) => {
+      console.log(JSON.stringify(args));
       setGameState(args);
     });
     socket.on('request-move',({nextRound, roundInfo}) => {
-      console.log(roundInfo)
       setRoundQuestion(Object.values(roundInfo.question)[0]);
       setNextRound(nextRound);
     });
@@ -38,22 +38,21 @@ const GameView = () => {
   const playingCards = useMemo(() => {
     if(gameState && nextRound) {
       const player2Id = Object.keys(gameState).find(client => client !== socket.id);
-      if(gameState[player2Id].move) {
-        const player2Card = getCardDetailsFromTmId(gameState[player2Id].move, stats);
+      if(gameState[player2Id].move && gameState[player2Id].move[nextRound]) {
+        const player2Card = getCardDetailsFromTmId(gameState[player2Id].move[nextRound], stats);
         setPlayer2Move(player2Card);
       }
       const cards = transformTeamToPlayingCards(gameState && gameState[socket.id] && gameState[socket.id].availableCards, stats);
       if(removeCard) {
         cards[removeCard] = undefined;
       }
-      // console.log(gameState[socket.id]);
       if(gameState[socket.id].result) {
         if(gameState[socket.id].result[nextRound] === 'W') {
           setResult('You Won!');
         } else if(gameState[socket.id].result[nextRound] === 'T') {
-          setResult('Match Tied!')
+          setResult('Match Tied!');
         } else if(gameState[socket.id].result[nextRound] === 'L'){
-          setResult('You Lost!')
+          setResult('You Lost!');
         }
       }
     
@@ -75,7 +74,9 @@ const GameView = () => {
     })
     socket.emit('move', {
       availableCards,
-      move: card.TMID
+      move: {
+        [nextRound]:  card.TMID
+      }
     });
     //removed card from deck
 
