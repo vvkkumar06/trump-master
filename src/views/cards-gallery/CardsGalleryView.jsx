@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, View, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
-import Toast from 'react-native-toast-message';
+import { SafeAreaView, StatusBar, StyleSheet, View, ToastAndroid, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux'
 import TMButton from '../../components/buttons/ButtonComponent';
@@ -23,10 +22,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
   useEffect(() => {
     socket.on("show-preload", (args, cb) => {
       if(args) {
-        Toast.show({
-          type: 'error',
-          text1: args.error
-        })
+        ToastAndroid.show(args.error, ToastAndroid.SHORT)
       } else {
         navigation.navigate('PreGameLoader');
       }

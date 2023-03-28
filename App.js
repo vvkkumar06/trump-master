@@ -1,7 +1,6 @@
 import store from './src/redux/store';
 import { Provider } from 'react-redux'
 import { Provider as PaperProvider } from 'react-native-paper';
-import { useEffect } from 'react';
 import SocketContext from './src/utils/SocketContext';
 import 'expo-dev-client';
 import NavigationView from './src/views/navigation/NavigationView';

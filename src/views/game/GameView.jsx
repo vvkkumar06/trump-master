@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ImageBackground, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native';
-import { useSelector } from 'react-redux';
 import { getCardDetailsFromTmId, transformTeamToPlayingCards } from '../../redux/reducers/utils';
 import { useFetchStatsQuery } from '../../redux/features/api';
 import styles from './gameViewStyles';
@@ -24,6 +23,9 @@ const GameView = () => {
   const [result, setResult] = useState(undefined);
   const [disableDrag, setDisableDrag] = useState(false);
   const [winner, setWinner] = useState(undefined);
+
+
+  // animation
 
   useEffect(() => {
     socket.emit('start-game');
