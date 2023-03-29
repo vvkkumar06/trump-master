@@ -17,7 +17,7 @@ const NavigationView = () => {
   const socket = useContext(SocketContext);
 
   socket.on("connect", () => {
-    console.log(socket.id);
+    console.log(`Connected to server - Id: ${socket.id}`);
   });
 
   useEffect(() => {

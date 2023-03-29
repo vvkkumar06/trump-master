@@ -9,7 +9,7 @@ import PlayerComponent from '../../components/PlayerComponent';
 import { CricketPlayerDisplayProps } from '../../utils/display-properties';
 import SocketContext from '../../utils/SocketContext';
 
-const GameView = () => {
+const GameView = ({navigation}) => {
   const socket = useContext(SocketContext);
   const { data: stats } = useFetchStatsQuery();
   const [nextRound, setNextRound] = useState(undefined);
@@ -30,6 +30,7 @@ const GameView = () => {
 
   useEffect(() => {
     socket.emit('start-game');
+    console.log('loaded: ', socket.id)
     socket.on('game-status', (args) => {
       setGameState(args);
       args.winner && setWinner(args.winner);
@@ -47,7 +48,12 @@ const GameView = () => {
   }, [])
 
   useEffect(() => {
-    winner && winner.length && socket.emit('end-game');
+    if(winner && winner.length) {
+      socket.emit('end-game');
+      setTimeout(() => {
+        navigation.navigate('Dashboard');
+      }, 5000)
+    }
   }, [winner]);
 
   useEffect(() => {
@@ -74,7 +80,6 @@ const GameView = () => {
         cards[removeCard] = undefined;
       }
       if (gameState[socket.id] && gameState[socket.id].result) {
-        console.log(socket.id, " : ", gameState[socket.id].result, nextRound)
         if (gameState[socket.id].result[nextRound] === 'W') {
           setResult(`You Won Round ${nextRound}`);
         } else if (gameState[socket.id].result[nextRound] === 'T') {
@@ -88,8 +93,6 @@ const GameView = () => {
       return {};
     }
   }, [gameState, nextRound, removeCard])
-
-  const { card1, card2, card3, card4, card5 } = playingCards;
 
   const handleCardDrop = (card, cardName, gameState, playingCards) => {
     // Set selected player
@@ -177,11 +180,17 @@ const GameView = () => {
           </View>
         </View>
         <View style={styles.cardsContainer}>
-          <PlayingCard data={card1} cardName="card1" onCardDrop={handleCardDrop} isDragDisabled={disableDrag} gameState={gameState} playingCards={playingCards} />
-          <PlayingCard data={card2} cardName="card2" onCardDrop={handleCardDrop} isDragDisabled={disableDrag} gameState={gameState} playingCards={playingCards} />
-          <PlayingCard data={card3} cardName="card3" onCardDrop={handleCardDrop} isDragDisabled={disableDrag} gameState={gameState} playingCards={playingCards} />
-          <PlayingCard data={card4} cardName="card4" onCardDrop={handleCardDrop} isDragDisabled={disableDrag} gameState={gameState} playingCards={playingCards} />
-          <PlayingCard data={card5} cardName="card5" onCardDrop={handleCardDrop} isDragDisabled={disableDrag} gameState={gameState} playingCards={playingCards} />
+          {['card1', 'card2', 'card3', 'card4', 'card5'].map(card => (
+            <PlayingCard
+              key={card}
+              data={playingCards[card]}
+              cardName={card}
+              recommendedCard={recommendedMove && recommendedMove[socket.id]}
+              onCardDrop={handleCardDrop}
+              isDragDisabled={disableDrag}
+              gameState={gameState}
+              playingCards={playingCards} />
+          ))}
         </View>
 
       </SafeAreaView>
