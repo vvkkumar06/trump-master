@@ -38,7 +38,6 @@ const GameView = () => {
       setRoundQuestion(Object.values(roundInfo.question)[0]);
       setNextRound(nextRound);
       setRecommendedMove(roundInfo.recommendedMove);
-      console.log(roundInfo.recommendedMove);
     });
     socket.on('game-over', ({ gameState, winner }) => {
       setGameState(gameState);
