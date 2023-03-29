@@ -14,6 +14,7 @@ const GameView = () => {
   const { data: stats } = useFetchStatsQuery();
   const [nextRound, setNextRound] = useState(undefined);
   const [roundQuestion, setRoundQuestion] = useState('');
+  const [recommendedMove, setRecommendedMove] = useState(undefined);
 
   // Reset below for every round
   const [player1, setPlayer1] = useState(undefined);
@@ -36,9 +37,10 @@ const GameView = () => {
     socket.on('request-move', ({ nextRound, roundInfo }) => {
       setRoundQuestion(Object.values(roundInfo.question)[0]);
       setNextRound(nextRound);
+      setRecommendedMove(roundInfo.recommendedMove);
+      console.log(roundInfo.recommendedMove);
     });
     socket.on('game-over', ({ gameState, winner }) => {
-      console.log(winner);
       setGameState(gameState);
       setWinner(winner);
     });
