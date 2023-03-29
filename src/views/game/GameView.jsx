@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { ImageBackground, Text, View } from 'react-native';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { Easing, ImageBackground, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native';
 import { getCardDetailsFromTmId, transformTeamToPlayingCards } from '../../redux/reducers/utils';
 import { useFetchStatsQuery } from '../../redux/features/api';
@@ -8,8 +8,9 @@ import PlayingCard from './PlayingCard';
 import PlayerComponent from '../../components/PlayerComponent';
 import { CricketPlayerDisplayProps } from '../../utils/display-properties';
 import SocketContext from '../../utils/SocketContext';
+import { Animated } from 'react-native';
 
-const GameView = ({navigation}) => {
+const GameView = ({ navigation }) => {
   const socket = useContext(SocketContext);
   const { data: stats } = useFetchStatsQuery();
   const [nextRound, setNextRound] = useState(undefined);
@@ -27,6 +28,48 @@ const GameView = ({navigation}) => {
 
 
   // animation
+  const roundFontSize = useRef(new Animated.Value(0)).current;
+  const questionOpacity = useRef(new Animated.Value(0)).current;
+  const winnerFontSize = useRef(new Animated.Value(0)).current;
+  const resultOpacity = useRef(new Animated.Value(0)).current;
+
+
+  const preRoundAnimation = (cb) => {
+    Animated.sequence([
+      Animated.timing(roundFontSize, {
+        useNativeDriver: false,
+        toValue: 36,
+        easing: Easing.exp,
+        duration: 2000,
+        delay: 1000
+      }),
+      Animated.timing(questionOpacity, {
+        useNativeDriver: false,
+        toValue: 1,
+        easing: Easing.linear,
+        duration: 2000,
+        delay: 500
+      })
+    ]).start(cb);
+  }
+
+  const postRoundAnimation = (cb) => {
+    Animated.timing(winnerFontSize, {
+      useNativeDriver: false,
+      toValue: 36,
+      easing: Easing.bounce,
+      duration: 2000
+    }).start(cb);
+  }
+
+  const resultAnimation = (cb) => {
+    Animated.timing(resultOpacity, {
+      useNativeDriver: false,
+      toValue: 1,
+      easing: Easing.ease,
+      duration: 1000
+    }).start(cb);
+  }
 
   useEffect(() => {
     socket.emit('start-game');
@@ -36,19 +79,25 @@ const GameView = ({navigation}) => {
       args.winner && setWinner(args.winner);
     });
     socket.on('request-move', ({ nextRound, roundInfo }) => {
+      roundFontSize.setValue(0);
+      questionOpacity.setValue(0);
       setRoundQuestion(Object.values(roundInfo.question)[0]);
       setNextRound(nextRound);
-      setRecommendedMove(roundInfo.recommendedMove);
+      preRoundAnimation(() => {
+        setRecommendedMove(roundInfo.recommendedMove);
+      })
     });
     socket.on('game-over', ({ gameState, winner }) => {
+      winnerFontSize.setValue(0);
       setGameState(gameState);
       setWinner(winner);
+      postRoundAnimation();
     });
 
   }, [])
 
   useEffect(() => {
-    if(winner && winner.length) {
+    if (winner && winner.length) {
       socket.emit('end-game');
       setTimeout(() => {
         navigation.navigate('Dashboard');
@@ -80,6 +129,7 @@ const GameView = ({navigation}) => {
         cards[removeCard] = undefined;
       }
       if (gameState[socket.id] && gameState[socket.id].result) {
+        resultOpacity.setValue(0);
         if (gameState[socket.id].result[nextRound] === 'W') {
           setResult(`You Won Round ${nextRound}`);
         } else if (gameState[socket.id].result[nextRound] === 'T') {
@@ -87,6 +137,7 @@ const GameView = ({navigation}) => {
         } else if (gameState[socket.id].result[nextRound] === 'L') {
           setResult(`You Lost Round ${nextRound}`);
         }
+        resultAnimation();
       }
       return cards;
     } else {
@@ -142,18 +193,27 @@ const GameView = ({navigation}) => {
             }
 
           </View>
-          <View>
+          <View style={{ display: 'flex', alignItems: 'center' }}>
             {
               winner ? (
-                <Text> {winner.length === 2 ? 'Game Tied' : winner.includes(socket.id) ? 'Game Over - You Won' : 'Game Over - You Lost'}</Text>
+                <Animated.Text style={[{ fontSize: winnerFontSize }]}> {winner.length === 2 ? 'Game Tied' : winner.includes(socket.id) ? 'You Won' : 'You Lost'}</Animated.Text>
               ) : (
                 <>
-                  <Text>
+                  {!result && (<Animated.Text style={[{ fontSize: roundFontSize }]}>
                     Round - {nextRound}
-                  </Text>
-                  <Text>
-                    {result ? result : roundQuestion}
-                  </Text>
+                  </Animated.Text>)}
+                  {
+                    result ? (
+                      <Animated.Text style={[{ opacity: resultOpacity }]}>
+                        {result}
+                      </Animated.Text>
+                    ) : (
+                      <Animated.Text style={[{ fontSize: 18 }, { opacity: questionOpacity }]}>
+                        {roundQuestion}
+                      </Animated.Text>
+                    )
+                  }
+
                 </>
               )
             }
