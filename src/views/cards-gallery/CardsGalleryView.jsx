@@ -17,11 +17,13 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
 
   const socket = useContext(SocketContext);
   const [selectedCard, setSelectedCard] = useState(undefined);
+  const [selectedTeamCard, setSelectedTeamCard] = useState(undefined);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     socket.on("show-preload", (args, cb) => {
-      if(args) {
+      if (args) {
         ToastAndroid.show(args.error, ToastAndroid.SHORT)
       } else {
         navigation.navigate('PreGameLoader');
@@ -71,7 +73,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
   }
   const selectedPlayerData = useMemo(() => {
     return listData ? listData.find(card => card.TMID === selectedCard) : {}
-  }, [selectedCard]);
+  }, [selectedCard, selectedTeamCard]);
 
   const canStartPlay = useMemo(() => {
     return collection && Object.values(JSON.parse(JSON.stringify(collection.playingCards))).length <= 2
@@ -81,23 +83,26 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
     <TouchableOpacity
       onPress={() => {
         setSelectedCard(undefined)
+        setSelectedTeamCard(undefined)
       }}
       activeOpacity={1}
       style={styles.background}
     >
-      <ImageBackground source={require('./../../../assets/background1.png')} resizeMode="cover" style={styles.background}>
+      <ImageBackground source={require('./../../../assets/background4.png')} resizeMode="cover" style={styles.background}>
         <SafeAreaView style={styles.container}>
           <View style={styles.galleryLeft}>
             {galleryHeader()}
-            {listData && listData.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
+            {listData && listData.length ? renderList() :
+              <Text style={styles.noCards}>No Cards Available!</Text>
+            }
           </View>
           <View style={styles.galleryRight}>
             {
-              selectedCard ? (
-                <CardDetailsView playerData={selectedPlayerData} />
+              selectedCard || selectedTeamCard ? (
+                <CardDetailsView playerData={selectedPlayerData || selectedTeamCard} />
               ) : (
                 <>
-                  <TeamView stats={stats} socket={socket} />
+                  <TeamView stats={stats} socket={socket} onTeamCardSelect={(item) => setSelectedTeamCard(item)}/>
                   <TMButton
                     label="Play Now"
                     type={'success'}
@@ -135,15 +140,17 @@ const styles = StyleSheet.create({
   },
   playNow: {
     width: "100%",
-    marginTop: 15,
-    color: '#ccc'
+    marginTop: 25,
+    color: '#ccc',
+    backgroundColor: 'rgba(0,200,0,0.5)'
   },
   galleryLeft: {
     width: '50%'
   },
   galleryRight: {
     alignItems: 'center',
-    width: '40%'
+    width: '40%',
+    marginRight: 15
   },
   playNowLabel: {
     fontWeight: 'bold',
@@ -158,7 +165,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noCards: {
-    fontStyle: 'italic'
+    fontStyle: 'italic',
+    color: '#eee'
   },
   galleryHeader: {
     height: 30,

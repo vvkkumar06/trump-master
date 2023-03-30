@@ -79,7 +79,7 @@ const PreGameLoaderView = ({ type, navigation }) => {
     </View>
   }
   return (
-    <ImageBackground source={require('./../../../../assets/background2.png')} resizeMode="cover" style={styles.background}>
+    <ImageBackground source={require('./../../../../assets/background4.png')} resizeMode="cover" style={styles.background}>
       <SafeAreaView style={styles.container}>
         <View style={styles.loaderContainer}>
           {

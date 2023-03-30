@@ -8,12 +8,12 @@ import { StatusBar } from 'react-native';
 import { io } from "socket.io-client";
 const socket = io("http://192.168.29.168:8080");
 export default function App() {
-
+  
   return (
     <PaperProvider>
       <Provider store={store}>
         <SocketContext.Provider value={socket}>
-         <StatusBar hidden />
+          <StatusBar hidden />
           <NavigationView />
         </SocketContext.Provider>
       </Provider>

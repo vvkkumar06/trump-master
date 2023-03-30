@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { Image, StyleSheet } from 'react-native';
-import { Card, Text } from 'react-native-paper';
-import { View } from 'react-native';
-import { transform } from 'lodash';
+import { Card  } from 'react-native-paper';
+import { View, Text } from 'react-native';
 
 const getShortName = (name) => {
   name = name && name.split(' ');
@@ -52,13 +51,13 @@ const PlayerComponent = ({ displayProps, playerData, coverColor,topStyle, idStyl
               flexDirection: 'row', borderWidth: 1, borderColor: '#666',
             }} key={key}>
               <Text  style={{
-                width: '50%', fontWeight: 'bold',
+                width: '50%', fontWeight: '900',
                 backgroundColor: '#333',
                 fontSize: getFontSize(height, 13),
                 color: '#eee'
               }}> {displayProps[key]} </Text>
               <Text style={{
-                textAlign: 'center', fontWeight: 'bold', letterSpacing: 0.2,
+                textAlign: 'center', fontWeight: '900', letterSpacing: 0.2,
                 width: '50%', borderWidth: 1, borderColor: '#ccc',
                 backgroundColor: '#ddd', color: '#333',
                 fontSize: getFontSize(height, 12),

@@ -58,7 +58,7 @@ export default StyleSheet.create({
     marginLeft: 20
   },
   roundText: {
-    textShadowColor: '#',
+    textShadowColor: '#000',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 1,
     fontWeight: '900',
