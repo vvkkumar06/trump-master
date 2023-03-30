@@ -22,7 +22,7 @@ const PlayingCard = ({onCardDrop, data, cardName, recommendedCard, onDragStart, 
             pan.setValue(newPos);
         },
         onPanResponderRelease: (e, gestureState) => {
-            if (gestureState.moveX < 90 && gestureState.moveY < 130) {
+            if (gestureState.moveX < 180 && gestureState.moveY < 250) {
                 onCardDrop && onCardDrop(data, cardName, gameState, playingCards);
             } else {
                 pan.setOffset({ x: 0, y: 0 })

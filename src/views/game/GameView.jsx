@@ -41,14 +41,13 @@ const GameView = ({ navigation }) => {
         toValue: 36,
         easing: Easing.exp,
         duration: 2000,
-        delay: 1000
+        delay: nextRound !==1 ? 2000 : 0
       }),
       Animated.timing(questionOpacity, {
         useNativeDriver: false,
         toValue: 1,
         easing: Easing.linear,
-        duration: 2000,
-        delay: 500
+        duration: 1000,
       })
     ]).start(cb);
   }
@@ -58,7 +57,7 @@ const GameView = ({ navigation }) => {
       useNativeDriver: false,
       toValue: 36,
       easing: Easing.bounce,
-      duration: 2000
+      duration: 3000
     }).start(cb);
   }
 
@@ -67,13 +66,12 @@ const GameView = ({ navigation }) => {
       useNativeDriver: false,
       toValue: 1,
       easing: Easing.ease,
-      duration: 1000
+      duration: 2000
     }).start(cb);
   }
 
   useEffect(() => {
     socket.emit('start-game');
-    console.log('loaded: ', socket.id)
     socket.on('game-status', (args) => {
       setGameState(args);
       args.winner && setWinner(args.winner);
@@ -113,7 +111,7 @@ const GameView = ({ navigation }) => {
         setDisableDrag(false);
         setRemoveCard(undefined);
         setResult(undefined);
-      }, 2000);
+      }, nextRound !== 1? 3000 : 1000);
     }
   }, [nextRound])
 
@@ -170,45 +168,49 @@ const GameView = ({ navigation }) => {
   }
 
   return (
-    <ImageBackground source={require('./../../../assets/background1.png')} resizeMode="cover" style={styles.background}>
+    <ImageBackground source={require('./../../../assets/background4.png')} resizeMode="cover" style={styles.background}>
       <SafeAreaView style={styles.container}>
         <View style={styles.selectedContainer}>
-          <View style={styles.player1SelectedContainer}>
+          <View style={[styles.player1SelectedContainer, , { width: 80, height: 120 }]}>
             {
               player1 ? (
-                <View key={'player1'} style={[styles.cardContainer]} >
+                <View key={'player1'} style={[styles.cardContainer, { width: 70, height: 110 }]} >
                   <PlayerComponent
                     displayProps={CricketPlayerDisplayProps}
                     coverColor='#ccc'
                     playerData={player1 || {}}
                     useShortName={true}
-                    height="160"
+                    height="110"
                   />
                 </View>
               ) : (
-                <Text>
+                <Text style={{ color: '#bbb', fontWeight: 'bold' }}>
                   You
                 </Text>
               )
             }
 
           </View>
-          <View style={{ display: 'flex', alignItems: 'center' }}>
+          <View style={{ display: 'flex', alignItems: 'center', width: 400 }}>
             {
               winner ? (
-                <Animated.Text style={[{ fontSize: winnerFontSize }]}> {winner.length === 2 ? 'Game Tied' : winner.includes(socket.id) ? 'You Won' : 'You Lost'}</Animated.Text>
+                <Animated.Text style={[
+                  styles.roundText,
+                  { color: winner.length === 2 ? 'orange' : winner.includes(socket.id) ? 'green' : 'red', fontSize: winnerFontSize }]}>
+                  {winner.length === 2 ? 'Tied' : winner.includes(socket.id) ? 'You Won' : 'You Lost'}
+                </Animated.Text>
               ) : (
                 <>
-                  {!result && (<Animated.Text style={[{ fontSize: roundFontSize }]}>
-                    Round - {nextRound}
+                  {!result && (<Animated.Text style={[styles.roundText, { color: 'yellow', fontSize: 36 }]}>
+                    ROUND {nextRound}
                   </Animated.Text>)}
                   {
                     result ? (
-                      <Animated.Text style={[{ opacity: resultOpacity }]}>
+                      <Animated.Text style={[styles.roundText, { fontSize: 24, color: result.includes('Won') ? 'green' : 'red', opacity: resultOpacity }]}>
                         {result}
                       </Animated.Text>
                     ) : (
-                      <Animated.Text style={[{ fontSize: 18 }, { opacity: questionOpacity }]}>
+                      <Animated.Text style={[styles.roundText, { fontSize: 18, color: 'orange' }, { opacity: questionOpacity }]}>
                         {roundQuestion}
                       </Animated.Text>
                     )
@@ -219,20 +221,20 @@ const GameView = ({ navigation }) => {
             }
 
           </View>
-          <View style={styles.player2SelectedContainer}>
+          <View style={[styles.player2SelectedContainer, { width: 80, height: 120 }]}>
             {
               player2Move ? (
-                <View key={'player2'} style={[styles.cardContainer]} >
+                <View key={'player2'} style={[styles.cardContainer, { width: 70, height: 110 }]} >
                   <PlayerComponent
                     displayProps={CricketPlayerDisplayProps}
                     coverColor='#ccc'
                     playerData={player2Move || {}}
                     useShortName={true}
-                    height="160"
+                    height="110"
                   />
                 </View>
               ) : (
-                <Text>
+                <Text style={{ color: '#bbb', fontWeight: 'bold', letterSpacing: 1, fontSize: 10 }}>
                   Opponent
                 </Text>
               )
@@ -257,6 +259,8 @@ const GameView = ({ navigation }) => {
     </ImageBackground>
   )
 }
+
+
 
 
 export default GameView;

@@ -19,26 +19,12 @@ const NavigationView = () => {
   socket.on("connect", () => {
     console.log(`Connected to server - Id: ${socket.id}`);
   });
-
-  useEffect(() => {
-    if(user) {
-      socket.on("start", (args, cb) => {
-        console.log("Starting Game");
-        console.log("Loading complete");
-        cb(user);
-  
-        socket.on('question1', (args, cb) => {
-          console.log(args)
-        })
-      });
-    }
-  }, [user]);
   
   const userId  = user && user.id ? user.id : undefined;
   const Stack = createNativeStackNavigator();
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false, headerShown: false}} initialRouteName={!userId ? "LoginView" : "Dashboard"}>
+      <Stack.Navigator screenOptions={{ headerShown: false, headerShown: false}} initialRouteName={!userId ? "Login" : "Dashboard"}>
         {
          !userId ? <>
             <Stack.Screen name="Login" component={LoginView} />
