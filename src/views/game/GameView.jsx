@@ -41,7 +41,6 @@ const GameView = ({ navigation }) => {
         toValue: 36,
         easing: Easing.exp,
         duration: 2000,
-        delay: nextRound !==1 ? 2000 : 0
       }),
       Animated.timing(questionOpacity, {
         useNativeDriver: false,
