@@ -39,7 +39,7 @@ const PlayerComponent = ({ displayProps, playerData, coverColor, topStyle, idSty
     <View style={{
       justifyContent: 'space-between', flexDirection: 'row', 
       flexWrap: 'wrap', backgroundColor: '#eee', alignContent: 'space-between', 
-      padding: 1, paddingTop: 0, paddingBottom: 1,
+      padding: 1, paddingTop: 0, paddingBottom: 1.5,
       ...styles.statsContainer
     }}>
       {
@@ -63,8 +63,8 @@ const PlayerComponent = ({ displayProps, playerData, coverColor, topStyle, idSty
               <Text style={{
                 textAlign: 'center',
                 width: '48%',color: '#333', fontFamily: 'ChangaOne-Italic',
-                fontSize: getFontSize(height, 12), 
-                borderWidth: 0.5, borderColor: 'rgba(0,0,0,0.4)', height: '100%', textAlignVertical: 'center',
+                fontSize: getFontSize(height, 15), 
+                borderWidth: 0.5, borderColor: 'rgba(0,0,0,0.4)', height: '100%', textAlignVertical: 'center'
               }} >{playerData[key] ? playerData[key] : '-'} </Text>
             </View>)
         }) : []
