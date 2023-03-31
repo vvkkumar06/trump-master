@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { Image, StyleSheet } from 'react-native';
-import { Card  } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import { View, Text } from 'react-native';
 
 const getShortName = (name) => {
   name = name && name.split(' ');
 
-  if(name && name.length > 1) {
+  if (name && name.length > 1) {
 
     let fName = name[0].substr(0, 1);
     let lName = name[1];
-    if(name.length === 3) {
+    if (name.length === 3) {
       lName += ' ' + name[2];
     }
     return `${fName} ${lName}`;
@@ -18,10 +18,10 @@ const getShortName = (name) => {
     return name;
   }
 };
-const getFontSize = (height, ref) =>  Math.floor((ref/280)*height);
+const getFontSize = (height, ref) => Math.floor((ref / 280) * height);
 
-const PlayerComponent = ({ displayProps, playerData, coverColor,topStyle, idStyle, height, textVariant="labelSmall", imageStyle, useShortName }) => (
-  
+const PlayerComponent = ({ displayProps, playerData, coverColor, topStyle, idStyle, height, textVariant = "labelSmall", imageStyle, useShortName }) => (
+
 
   <Card elevated key={playerData.PlayerName} style={[styles.container]} >
     <View style={[styles.topLeftBox, topStyle]} />
@@ -29,7 +29,7 @@ const PlayerComponent = ({ displayProps, playerData, coverColor,topStyle, idStyl
       style={[styles.logo, imageStyle]}
       source={require('./../../assets/images/app-icons/logo.png')}
     />
-    <Text style={[styles.id, idStyle, {fontSize: getFontSize(height, 24)}]}>C#{playerData.TMID}</Text>
+    <Text style={[styles.id, idStyle, { fontSize: getFontSize(height, 24) }]}>C#{playerData.TMID}</Text>
     <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor, borderRadius: 0 }} resizeMode='contain' />
     <Text style={{
       textAlign: 'center', textTransform: 'uppercase', fontWeight: 'bold',
@@ -37,8 +37,9 @@ const PlayerComponent = ({ displayProps, playerData, coverColor,topStyle, idStyl
       fontSize: getFontSize(height, 16),
     }}>{!useShortName ? playerData.PlayerName : getShortName(playerData.PlayerName)}</Text>
     <View style={{
-      justifyContent: 'space-between', flexDirection: 'row',
-      padding: 0, flexWrap: 'wrap',
+      justifyContent: 'space-between', flexDirection: 'row', 
+      flexWrap: 'wrap', backgroundColor: '#eee', alignContent: 'space-between', 
+      padding: 1, paddingTop: 0, paddingBottom: 1,
       ...styles.statsContainer
     }}>
       {
@@ -47,20 +48,23 @@ const PlayerComponent = ({ displayProps, playerData, coverColor,topStyle, idStyl
           return (
             <View style={{
               ...styles.statsRow,
-              justifyContent: 'space-between', width: '50%',
-              flexDirection: 'row', borderWidth: 1, borderColor: '#666',
+              justifyContent: 'space-between', width: '49%',
+              flexDirection: 'row', height: '14%', alignSelf: 'center',
             }} key={key}>
-              <Text  style={{
-                width: '50%', fontWeight: '900',
+              <Text style={{
+                width: '48%',
                 backgroundColor: '#333',
+                fontFamily: 'ChangaOne-Italic',
                 fontSize: getFontSize(height, 13),
-                color: '#eee'
+                color: '#eee',
+                borderWidth: 0.5, borderColor: '#000', borderColor: 'rgba(0,0,0,0.4)',
+                height: '100%', textAlignVertical: 'center',
               }}> {displayProps[key]} </Text>
               <Text style={{
-                textAlign: 'center', fontWeight: '900', letterSpacing: 0.2,
-                width: '50%', borderWidth: 1, borderColor: '#ccc',
-                backgroundColor: '#ddd', color: '#333',
-                fontSize: getFontSize(height, 12),
+                textAlign: 'center',
+                width: '48%',color: '#333', fontFamily: 'ChangaOne-Italic',
+                fontSize: getFontSize(height, 12), 
+                borderWidth: 0.5, borderColor: 'rgba(0,0,0,0.4)', height: '100%', textAlignVertical: 'center',
               }} >{playerData[key] ? playerData[key] : '-'} </Text>
             </View>)
         }) : []
@@ -87,7 +91,7 @@ const styles = StyleSheet.create({
   topLeftBox: {
     width: '68%',
     height: '7%',
-    top: 0,
+    top: 1,
     backgroundColor: '#ccc',
     borderTopRightRadius: 55
   },

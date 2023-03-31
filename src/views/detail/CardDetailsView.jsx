@@ -82,7 +82,9 @@ const CardDetailsView = ({playerData}) => {
 const styles = StyleSheet.create({
   container: {
     width: 220,
-    height: 280
+    height: 280,
+    paddingBottom: 3,
+    backgroundColor: 'white'
   }
 });
 

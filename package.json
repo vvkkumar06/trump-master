@@ -38,7 +38,8 @@
     "react-native-web": "~0.18.7",
     "react-redux": "^8.0.5",
     "redux": "^4.2.1",
-    "socket.io-client": "^4.6.1"
+    "socket.io-client": "^4.6.1",
+    "expo-font": "~11.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
