@@ -64,7 +64,7 @@ const PreGameLoaderView = ({ type, navigation }) => {
         useNativeDriver: false
       })
     ]).start(() => {
-      navigation.navigate('GameView')
+      navigation.navigate('GameView', { userDetails })
     })
   }
 

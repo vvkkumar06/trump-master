@@ -9,13 +9,32 @@ import PlayerComponent from '../../components/PlayerComponent';
 import { CricketPlayerDisplayProps } from '../../utils/display-properties';
 import SocketContext from '../../utils/SocketContext';
 import { Animated } from 'react-native';
+import { Avatar, Badge } from 'react-native-paper';
 
-const GameView = ({ navigation }) => {
+const GameView = ({ route, navigation }) => {
   const socket = useContext(SocketContext);
   const { data: stats } = useFetchStatsQuery();
   const [nextRound, setNextRound] = useState(undefined);
   const [roundQuestion, setRoundQuestion] = useState('');
   const [recommendedMove, setRecommendedMove] = useState(undefined);
+  const [opponentId, setOpponentId] = useState(undefined);
+  const { userDetails } = route.params || {};
+
+  const players = useMemo(() => {
+    const players = {};
+    if(userDetails && userDetails[1] && userDetails[2]){
+      if(userDetails[1].clientId === socket.id) {
+        players['p1'] = userDetails[1].clientInfo;
+        players['p2'] = userDetails[2].clientInfo;
+        setOpponentId(userDetails[2].clientId);
+      } else {
+        players['p1'] = userDetails[2].clientInfo;
+        players['p2'] = userDetails[1].clientInfo;
+        setOpponentId(userDetails[1].clientId)
+      }
+    } 
+    return players;
+  }, [userDetails]);
 
   // Reset below for every round
   const [player1, setPlayer1] = useState(undefined);
@@ -110,7 +129,7 @@ const GameView = ({ navigation }) => {
         setDisableDrag(false);
         setRemoveCard(undefined);
         setResult(undefined);
-      }, nextRound !== 1? 3000 : 1000);
+      }, nextRound !== 1 ? 3000 : 1000);
     }
   }, [nextRound])
 
@@ -166,9 +185,47 @@ const GameView = ({ navigation }) => {
     setDisableDrag(true);
   }
 
+  const getRoundColor = (round, isOpponent) => {
+    const id = isOpponent ? opponentId : socket.id;
+    if(id && gameState) {
+      const status = gameState[id].result[round];
+      if(status && (status  === 'W')) {
+        return 'green';
+      } else if(status && (status  === 'L')) {
+        return 'red';
+      } else {
+        return 'transparent';
+      }
+    }
+    return 'transparent';
+  }
+
   return (
     <ImageBackground source={require('./../../../assets/background4.png')} resizeMode="cover" style={styles.background}>
       <SafeAreaView style={styles.container}>
+        <View style={styles.topDesign}>
+          <View style={styles.topLeftLine} >
+            {players['p1'] && <Avatar.Image size={40} source={{ uri: players['p1'].picture }} />}
+            <View style={styles.roundInfo1}>
+              <Badge key="p1-r1" style={[styles.roundBadge, {backgroundColor: getRoundColor(1)}]} size={15} />
+              <Badge key="p1-r2" style={[styles.roundBadge, {backgroundColor: getRoundColor(2)}]} size={15}/>
+              <Badge key="p1-r3" style={[styles.roundBadge, {backgroundColor: getRoundColor(3)}]} size={15}/>
+            </View>
+          </View>
+          <View style={styles.centerLine}>
+            {!result && (<Animated.Text style={[styles.roundText, { color: 'yellow', fontSize: 36 }]}>
+              ROUND {nextRound}
+            </Animated.Text>)}
+          </View>
+          <View style={styles.topRightLine} >
+          {players['p2'] && <Avatar.Image size={40} source={{ uri: players['p2'].picture }} />}
+          <View style={styles.roundInfo2}>
+              <Badge key="p2-r1" style={[styles.roundBadge, {backgroundColor: getRoundColor(1, true)}]} size={15}/>
+              <Badge key="p2-r2" style={[styles.roundBadge, {backgroundColor: getRoundColor(2, true)}]} size={15}/>
+              <Badge key="p2-r3" style={[styles.roundBadge, {backgroundColor: getRoundColor(3, true)}]} size={15}/>
+            </View>
+          </View>
+        </View>
         <View style={styles.selectedContainer}>
           <View style={[styles.player1SelectedContainer, , { width: 80, height: 120 }]}>
             {
@@ -200,9 +257,7 @@ const GameView = ({ navigation }) => {
                 </Animated.Text>
               ) : (
                 <>
-                  {!result && (<Animated.Text style={[styles.roundText, { color: 'yellow', fontSize: 36 }]}>
-                    ROUND {nextRound}
-                  </Animated.Text>)}
+
                   {
                     result ? (
                       <Animated.Text style={[styles.roundText, { fontSize: 24, color: result.includes('Won') ? 'green' : 'red', opacity: resultOpacity }]}>
@@ -240,6 +295,7 @@ const GameView = ({ navigation }) => {
             }
           </View>
         </View>
+
         <View style={styles.cardsContainer}>
           {['card1', 'card2', 'card3', 'card4', 'card5'].map(card => (
             <PlayingCard

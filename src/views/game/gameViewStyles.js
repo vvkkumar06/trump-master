@@ -63,6 +63,78 @@ export default StyleSheet.create({
     textShadowRadius: 1,
     fontWeight: '900',
     fontStyle: 'italic',
-    letterSpacing: 1.2
+    letterSpacing: 1.2,
+  },
+  topDesign: {
+    width: '100%',
+    height: 50,
+    marginHorizontal: 20,
+    top: -20,
+    position: 'absolute',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'flex-end'
+  },
+  topLeftLine: {
+    height: '100%',
+    width: '32%',
+    borderWidth: 2,
+    borderColor: 'orange',
+    borderBottomRightRadius: 50,
+    borderTopRightRadius: 50,
+    borderBottomLeftRadius: 100,
+    borderTopWidth: 0,
+    borderLeftWidth: 0,
+    borderRightWidth: 10,
+    paddingLeft: 15,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+  },
+  topRightLine: {
+    height: '100%',
+    width: '32%',
+    borderWidth: 2,
+    borderColor: 'orange',
+    borderBottomLeftRadius: 50,
+    borderTopLeftRadius: 50,
+    borderBottomRightRadius: 100,
+    borderTopWidth: 0,
+    borderRightWidth: 0,
+    borderLeftWidth: 10,
+    paddingLeft: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  centerLine: {
+    height: '100%',
+    width: '32%',
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    borderBottomLeftRadius: 100,
+    borderBottomRightRadius: 100,
+    borderWidth: 2,
+    borderColor: 'orange',
+    borderBottomWidth: 0,
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
+  roundInfo1: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    height: '90%',
+    marginLeft: 5
+  },
+  roundInfo2: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    height: '90%',
+    marginLeft: 5
+  },
+  roundBadge: {
+    margin: 2,
+    borderWidth: 2,
+    borderColor: '#ccc'
   }
 });
