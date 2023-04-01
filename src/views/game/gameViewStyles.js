@@ -35,7 +35,6 @@ export default StyleSheet.create({
     borderWidth: 5,
     borderStyle: 'solid',
     borderColor: '#ccc',
-    backgroundColor: '#612',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

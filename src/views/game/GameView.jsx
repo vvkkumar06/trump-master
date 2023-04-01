@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Easing, ImageBackground, Text, View } from 'react-native';
+import { Easing, Image, ImageBackground, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native';
 import { getCardDetailsFromTmId, transformTeamToPlayingCards } from '../../redux/reducers/utils';
 import { useFetchStatsQuery } from '../../redux/features/api';
@@ -46,7 +46,7 @@ const GameView = ({ route, navigation }) => {
   const [removeCard, setRemoveCard] = useState(undefined);
   const [gameState, setGameState] = useState(undefined);
   const [result, setResult] = useState(undefined);
-  const [disableDrag, setDisableDrag] = useState(false);
+  const [disableDrag, setDisableDrag] = useState(true);
   const [winner, setWinner] = useState(undefined);
 
 
@@ -121,6 +121,7 @@ const GameView = ({ route, navigation }) => {
         setRecommendedMove(roundInfo.recommendedMove);
         setP1Time(30);
         setP2Time(30);
+        setDisableDrag(false);
       })
     });
     socket.on('game-over', ({ gameState, winner }) => {
@@ -146,7 +147,6 @@ const GameView = ({ route, navigation }) => {
       setTimeout(() => {
         setPlayer1(undefined);
         setPlayer2Move(undefined);
-        setDisableDrag(false);
         setRemoveCard(undefined);
         setResult(undefined);
       }, nextRound !== 1 ? 3000 : 1000);
@@ -229,7 +229,7 @@ const GameView = ({ route, navigation }) => {
               {p1Time && !player1 ? getTimer(p1Time) : <></>}
               {players['p1'] && <Avatar.Image size={40} source={{ uri: players['p1'].picture }} style={{ position: 'absolute', marginTop: 5 }} />}
             </View>
-              {players['p1'] && <Text style={{ color: 'white', position: 'absolute' ,left: 80, bottom: 0}}>{players['p1'].name}</Text>}
+            {players['p1'] && <Text style={{ color: 'white', position: 'absolute', left: 80, bottom: 0 }}>{players['p1'].name}</Text>}
 
             <View style={styles.roundInfo1}>
               <Badge key="p1-r1" style={[styles.roundBadge, { backgroundColor: getRoundColor(1) }]} size={15} />
@@ -249,7 +249,7 @@ const GameView = ({ route, navigation }) => {
               {p2Time && !player2Move ? getTimer(p2Time) : <></>}
               {players['p2'] && <Avatar.Image size={40} source={{ uri: players['p2'].picture }} style={{ position: 'absolute', marginTop: 5 }} />}
             </View>
-            {players['p2'] && <Text style={{ color: 'white', position: 'absolute' ,left: 65, bottom: 0}}>{players['p2'].name}</Text>}
+            {players['p2'] && <Text style={{ color: 'white', position: 'absolute', left: 65, bottom: 0 }}>{players['p2'].name}</Text>}
 
             <View style={styles.roundInfo2}>
               <Badge key="p2-r1" style={[styles.roundBadge, { backgroundColor: getRoundColor(1, true) }]} size={15} />
@@ -309,7 +309,7 @@ const GameView = ({ route, navigation }) => {
           </View>
           <View style={[styles.player2SelectedContainer, { width: 80, height: 120 }]}>
             {
-              player2Move ? (
+              player2Move ? (player1 ? (
                 <View key={'player2'} style={[styles.cardContainer, { width: 70, height: 110 }]} >
                   <PlayerComponent
                     displayProps={CricketPlayerDisplayProps}
@@ -318,8 +318,16 @@ const GameView = ({ route, navigation }) => {
                     useShortName={true}
                     height="110"
                   />
+                </View>) : (
+                <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', position: 'relative'}}>
+                  <ImageBackground source={require('./../../../assets/card-backface.jpg')} resizeMode="cover" style={{ width: '100%', height: '100%' }} />
+                  <Image
+                   style={{width: 50, height: 50, position: 'absolute'}}
+                    source={require('./../../../assets/images/app-icons/logo.png')}
+                  />
                 </View>
-              ) : (
+
+              )) : (
                 <Text style={{ color: '#bbb', fontWeight: 'bold' }}>
                   Opponent
                 </Text>
