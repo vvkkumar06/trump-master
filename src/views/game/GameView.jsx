@@ -10,6 +10,8 @@ import { CricketPlayerDisplayProps } from '../../utils/display-properties';
 import SocketContext from '../../utils/SocketContext';
 import { Animated } from 'react-native';
 import { Avatar, Badge } from 'react-native-paper';
+import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
+
 
 const GameView = ({ route, navigation }) => {
   const socket = useContext(SocketContext);
@@ -18,12 +20,14 @@ const GameView = ({ route, navigation }) => {
   const [roundQuestion, setRoundQuestion] = useState('');
   const [recommendedMove, setRecommendedMove] = useState(undefined);
   const [opponentId, setOpponentId] = useState(undefined);
+  const [p1Time, setP1Time] = useState(0);
+  const [p2Time, setP2Time] = useState(0);
   const { userDetails } = route.params || {};
 
   const players = useMemo(() => {
     const players = {};
-    if(userDetails && userDetails[1] && userDetails[2]){
-      if(userDetails[1].clientId === socket.id) {
+    if (userDetails && userDetails[1] && userDetails[2]) {
+      if (userDetails[1].clientId === socket.id) {
         players['p1'] = userDetails[1].clientInfo;
         players['p2'] = userDetails[2].clientInfo;
         setOpponentId(userDetails[2].clientId);
@@ -32,7 +36,7 @@ const GameView = ({ route, navigation }) => {
         players['p2'] = userDetails[1].clientInfo;
         setOpponentId(userDetails[1].clientId)
       }
-    } 
+    }
     return players;
   }, [userDetails]);
 
@@ -51,6 +55,18 @@ const GameView = ({ route, navigation }) => {
   const questionOpacity = useRef(new Animated.Value(0)).current;
   const winnerFontSize = useRef(new Animated.Value(0)).current;
   const resultOpacity = useRef(new Animated.Value(0)).current;
+
+
+  const getTimer = (time) => (
+    <CountdownCircleTimer
+      isPlaying
+      strokeWidth={6}
+      size={50}
+      duration={time}
+      colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+      colorsTime={[time - time / 4, time - time / 2, time - time * 3 / 4, 0]}
+    />
+  )
 
 
   const preRoundAnimation = (cb) => {
@@ -95,12 +111,16 @@ const GameView = ({ route, navigation }) => {
       args.winner && setWinner(args.winner);
     });
     socket.on('request-move', ({ nextRound, roundInfo }) => {
+      setP1Time(0);
+      setP2Time(0);
       roundFontSize.setValue(0);
       questionOpacity.setValue(0);
       setRoundQuestion(Object.values(roundInfo.question)[0]);
       setNextRound(nextRound);
       preRoundAnimation(() => {
         setRecommendedMove(roundInfo.recommendedMove);
+        setP1Time(30);
+        setP2Time(30);
       })
     });
     socket.on('game-over', ({ gameState, winner }) => {
@@ -187,11 +207,11 @@ const GameView = ({ route, navigation }) => {
 
   const getRoundColor = (round, isOpponent) => {
     const id = isOpponent ? opponentId : socket.id;
-    if(id && gameState) {
+    if (id && gameState) {
       const status = gameState[id].result[round];
-      if(status && (status  === 'W')) {
+      if (status && (status === 'W')) {
         return 'green';
-      } else if(status && (status  === 'L')) {
+      } else if (status && (status === 'L')) {
         return 'red';
       } else {
         return 'transparent';
@@ -205,29 +225,42 @@ const GameView = ({ route, navigation }) => {
       <SafeAreaView style={styles.container}>
         <View style={styles.topDesign}>
           <View style={styles.topLeftLine} >
-            {players['p1'] && <Avatar.Image size={40} source={{ uri: players['p1'].picture }} />}
+            <View style={{ width: 20, height: 20, marginRight: 20, marginLeft: 20, marginBottom: 35, alignItems: 'center' }}>
+              {p1Time && !player1 ? getTimer(p1Time) : <></>}
+              {players['p1'] && <Avatar.Image size={40} source={{ uri: players['p1'].picture }} style={{ position: 'absolute', marginTop: 5 }} />}
+            </View>
+              {players['p1'] && <Text style={{ color: 'white', position: 'absolute' ,left: 80, bottom: 0}}>{players['p1'].name}</Text>}
+
             <View style={styles.roundInfo1}>
-              <Badge key="p1-r1" style={[styles.roundBadge, {backgroundColor: getRoundColor(1)}]} size={15} />
-              <Badge key="p1-r2" style={[styles.roundBadge, {backgroundColor: getRoundColor(2)}]} size={15}/>
-              <Badge key="p1-r3" style={[styles.roundBadge, {backgroundColor: getRoundColor(3)}]} size={15}/>
+              <Badge key="p1-r1" style={[styles.roundBadge, { backgroundColor: getRoundColor(1) }]} size={15} />
+              <Badge key="p1-r2" style={[styles.roundBadge, { backgroundColor: getRoundColor(2) }]} size={15} />
+              <Badge key="p1-r3" style={[styles.roundBadge, { backgroundColor: getRoundColor(3) }]} size={15} />
             </View>
           </View>
           <View style={styles.centerLine}>
-            {!result && (<Animated.Text style={[styles.roundText, { color: 'yellow', fontSize: 36 }]}>
-              ROUND {nextRound}
-            </Animated.Text>)}
+            {!result && (
+              <Animated.Text style={[styles.roundText, { color: 'yellow', fontSize: 36 }]}>
+                ROUND {nextRound}
+              </Animated.Text>
+            )}
           </View>
           <View style={styles.topRightLine} >
-          {players['p2'] && <Avatar.Image size={40} source={{ uri: players['p2'].picture }} />}
-          <View style={styles.roundInfo2}>
-              <Badge key="p2-r1" style={[styles.roundBadge, {backgroundColor: getRoundColor(1, true)}]} size={15}/>
-              <Badge key="p2-r2" style={[styles.roundBadge, {backgroundColor: getRoundColor(2, true)}]} size={15}/>
-              <Badge key="p2-r3" style={[styles.roundBadge, {backgroundColor: getRoundColor(3, true)}]} size={15}/>
+            <View style={{ width: 20, height: 20, marginRight: 20, marginLeft: 20, marginBottom: 35, alignItems: 'center' }}>
+              {p2Time && !player2Move ? getTimer(p2Time) : <></>}
+              {players['p2'] && <Avatar.Image size={40} source={{ uri: players['p2'].picture }} style={{ position: 'absolute', marginTop: 5 }} />}
+            </View>
+            {players['p2'] && <Text style={{ color: 'white', position: 'absolute' ,left: 65, bottom: 0}}>{players['p2'].name}</Text>}
+
+            <View style={styles.roundInfo2}>
+              <Badge key="p2-r1" style={[styles.roundBadge, { backgroundColor: getRoundColor(1, true) }]} size={15} />
+              <Badge key="p2-r2" style={[styles.roundBadge, { backgroundColor: getRoundColor(2, true) }]} size={15} />
+              <Badge key="p2-r3" style={[styles.roundBadge, { backgroundColor: getRoundColor(3, true) }]} size={15} />
             </View>
           </View>
         </View>
         <View style={styles.selectedContainer}>
-          <View style={[styles.player1SelectedContainer, , { width: 80, height: 120 }]}>
+          <View style={[styles.player1SelectedContainer,
+          { width: 80, height: 120 }]}>
             {
               player1 ? (
                 <View key={'player1'} style={[styles.cardContainer, { width: 70, height: 110 }]} >
@@ -257,7 +290,6 @@ const GameView = ({ route, navigation }) => {
                 </Animated.Text>
               ) : (
                 <>
-
                   {
                     result ? (
                       <Animated.Text style={[styles.roundText, { fontSize: 24, color: result.includes('Won') ? 'green' : 'red', opacity: resultOpacity }]}>
@@ -288,10 +320,11 @@ const GameView = ({ route, navigation }) => {
                   />
                 </View>
               ) : (
-                <Text style={{ color: '#bbb', fontWeight: 'bold', letterSpacing: 1, fontSize: 10 }}>
+                <Text style={{ color: '#bbb', fontWeight: 'bold' }}>
                   Opponent
                 </Text>
               )
+
             }
           </View>
         </View>

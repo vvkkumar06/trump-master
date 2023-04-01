@@ -67,7 +67,7 @@ export default StyleSheet.create({
   },
   topDesign: {
     width: '100%',
-    height: 50,
+    height: 53,
     marginHorizontal: 20,
     top: -20,
     position: 'absolute',
@@ -87,7 +87,7 @@ export default StyleSheet.create({
     borderLeftWidth: 0,
     borderRightWidth: 10,
     paddingLeft: 15,
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
   },
   topRightLine: {
@@ -102,7 +102,7 @@ export default StyleSheet.create({
     borderRightWidth: 0,
     borderLeftWidth: 10,
     paddingLeft: 5,
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
   },
   centerLine: {
@@ -119,17 +119,17 @@ export default StyleSheet.create({
     justifyContent: 'center'
   },
   roundInfo1: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-end',
-    height: '90%',
-    marginLeft: 5
-  },
-  roundInfo2: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
-    height: '90%',
+    height: '30%',
+    marginLeft: 5,
+  },
+  roundInfo2: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    height: '30%',
     marginLeft: 5
   },
   roundBadge: {
