@@ -1,41 +1,70 @@
 import * as React from 'react';
 import { Image, StyleSheet } from 'react-native';
-import { Card, Text } from 'react-native-paper';
-import { View } from 'react-native';
+import { Card } from 'react-native-paper';
+import { View, Text } from 'react-native';
 
-const PlayerComponent = ({ displayProps, playerData, coverColor }) => (
-  <Card elevated key={playerData.PlayerName} style={styles.container} >
-    <View style={styles.topLeftBox} />
+const getShortName = (name) => {
+  name = name && name.split(' ');
+
+  if (name && name.length > 1) {
+
+    let fName = name[0].substr(0, 1);
+    let lName = name[1];
+    if (name.length === 3) {
+      lName += ' ' + name[2];
+    }
+    return `${fName} ${lName}`;
+  } else {
+    return name;
+  }
+};
+const getFontSize = (height, ref) => Math.floor((ref / 280) * height);
+
+const PlayerComponent = ({ displayProps, playerData, coverColor, topStyle, idStyle, height, textVariant = "labelSmall", imageStyle, useShortName }) => (
+
+
+  <Card elevated key={playerData.PlayerName} style={[styles.container]} >
+    <View style={[styles.topLeftBox, topStyle]} />
     <Image
-      style={styles.logo}
+      style={[styles.logo, imageStyle]}
       source={require('./../../assets/images/app-icons/logo.png')}
     />
-    <Text style={styles.id}>C#{playerData.TMID}</Text>
+    <Text style={[styles.id, idStyle, { fontSize: getFontSize(height, 24) }]}>C#{playerData.TMID}</Text>
     <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor, borderRadius: 0 }} resizeMode='contain' />
     <Text style={{
       textAlign: 'center', textTransform: 'uppercase', fontWeight: 'bold',
-      backgroundColor: '#333', color: '#eee', fontStyle: 'italic'
-    }}>{playerData.PlayerName}</Text>
+      backgroundColor: '#333', color: '#eee', fontStyle: 'italic',
+      fontSize: getFontSize(height, 16),
+    }}>{!useShortName ? playerData.PlayerName : getShortName(playerData.PlayerName)}</Text>
     <View style={{
-      justifyContent: 'space-between', flexDirection: 'row',
-      padding: 0, flexWrap: 'wrap'
+      justifyContent: 'space-between', flexDirection: 'row', 
+      flexWrap: 'wrap', backgroundColor: '#eee', alignContent: 'space-between', 
+      padding: 1, paddingTop: 0, paddingBottom: 1.5,
+      ...styles.statsContainer
     }}>
       {
         displayProps ? Object.keys(displayProps).map(key => {
 
           return (
             <View style={{
-              justifyContent: 'space-between', width: '50%',
-              flexDirection: 'row', marginBottom: 2, borderWidth: 1, borderColor: '#666'
+              ...styles.statsRow,
+              justifyContent: 'space-between', width: '49%',
+              flexDirection: 'row', height: '14%', alignSelf: 'center',
             }} key={key}>
-              <Text variant="labelSmall" style={{
-                width: '50%', fontWeight: 'bold',
+              <Text style={{
+                width: '48%',
                 backgroundColor: '#333',
-                color: '#eee'
+                fontFamily: 'ChangaOne-Italic',
+                fontSize: getFontSize(height, 13),
+                color: '#eee',
+                borderWidth: 0.5, borderColor: '#000', borderColor: 'rgba(0,0,0,0.4)',
+                height: '100%', textAlignVertical: 'center',
               }}> {displayProps[key]} </Text>
-              <Text variant="labelSmall" style={{
-                textAlign: 'center', fontSize: 10,
-                width: '50%', borderWidth: 1, borderColor: '#ccc'
+              <Text style={{
+                textAlign: 'center',
+                width: '48%',color: '#333', fontFamily: 'ChangaOne-Italic',
+                fontSize: getFontSize(height, 15), 
+                borderWidth: 0.5, borderColor: 'rgba(0,0,0,0.4)', height: '100%', textAlignVertical: 'center'
               }} >{playerData[key] ? playerData[key] : '-'} </Text>
             </View>)
         }) : []
@@ -43,7 +72,7 @@ const PlayerComponent = ({ displayProps, playerData, coverColor }) => (
     </View>
   </Card>
 );
-
+// Min supported width 150
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -53,40 +82,45 @@ const styles = StyleSheet.create({
     backgroundColor: '#999'
   },
   image: {
-    height: 100,
+    height: '38%',
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
     borderTopLeftRadius: 55,
     borderRadius: 0
   },
   topLeftBox: {
-    width: 150,
-    height: 20,
-    top: 0,
+    width: '68%',
+    height: '7%',
+    top: 1,
     backgroundColor: '#ccc',
     borderTopRightRadius: 55
   },
   id: {
     position: 'absolute',
-    top: 70,
+    top: '25%',
     left: 0,
     backgroundColor: '#aaa',
     color: '#111',
-    width: 100,
-    height: 40,
+    width: '45.5%',
+    height: '14%',
     fontWeight: 'bold',
-    fontSize: 24,
     fontStyle: 'italic',
     textAlign: 'center',
     zIndex: 1
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: '22.7%',
+    height: '18%',
     position: 'absolute',
-    top: 15,
-    right: -6,
+    top: '5%',
+    right: '-0.5%',
     zIndex: 1
+  },
+  statsRow: {
+    height: "17%"
+  },
+  statsContainer: {
+    height: '47%'
   }
 })
 

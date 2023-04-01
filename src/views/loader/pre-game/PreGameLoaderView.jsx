@@ -1,23 +1,27 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { ImageBackground, SafeAreaView, StatusBar, StyleSheet, View, Animated, Image, Easing } from 'react-native';
-import { Text } from 'react-native-paper';
+import { BackHandler } from 'react-native';
+import { ImageBackground, SafeAreaView, StatusBar,Image, StyleSheet, View, Animated, Easing } from 'react-native';
+import { Text, Avatar } from 'react-native-paper';
 import SocketContext from '../../../utils/SocketContext';
 
-const PreGameLoaderView = ({ type }) => {
+const PreGameLoaderView = ({ type, navigation }) => {
   const socket = useContext(SocketContext);
-
   const [timer, setTimer] = useState(30);
   const [userDetails, setUserDetails] = useState([])
   const fontSize = useRef(new Animated.Value(15)).current;
   const colorOpacity = useRef(new Animated.Value(0.5)).current;
   useEffect(() => {
-    socket.on("pre-game", (args, cb) => {
-      setUserDetails(args);
+    socket.on("load-game", (args, cb) => {
+      setUserDetails(args.players)
     });
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
+    return () => {
+      backHandler.remove();
+    }
   }, []);
 
   useEffect(() => {
-    if (userDetails[0] && userDetails[1]) {
+    if (userDetails[1] && userDetails[2]) {
       animateUserText();
     }
   }, [userDetails])
@@ -59,7 +63,9 @@ const PreGameLoaderView = ({ type }) => {
         easing: Easing.ease,
         useNativeDriver: false
       })
-    ]).start()
+    ]).start(() => {
+      navigation.navigate('GameView', { userDetails })
+    })
   }
 
   const getRippleAnimation = () => {
@@ -73,29 +79,31 @@ const PreGameLoaderView = ({ type }) => {
     </View>
   }
   return (
-    <ImageBackground source={require('./../../../../assets/background2.png')} resizeMode="cover" style={styles.background}>
+    <ImageBackground source={require('./../../../../assets/background4.png')} resizeMode="cover" style={styles.background}>
       <SafeAreaView style={styles.container}>
         <View style={styles.loaderContainer}>
           {
-            !(userDetails && userDetails[0] && userDetails && userDetails[1]) ? (
+            !(userDetails && userDetails[1] && userDetails[2]) ? (
               <View>
                 {getRippleAnimation()}
                 <View style={styles.loader}>
-                  <Text variant="displayLarge" style={{ color: 'white' }}>{timer > 0 ? timer : 0}</Text>
+                  <Text variant="displayLarge" style={{ color: 'white', marginRight: 20 }}>{timer > 0 ? timer : 0}</Text>
                   <Text variant="titleLarge" style={{ color: 'white' }}>Seaching for Opponent ...</Text>
                 </View>
               </View>
             ) :
               (
                 <View style={{ flexDirection: 'row', width: 800 }}>
-                  <View style={{ width: 350, paddingRight: 30 }}>
-                    <Animated.Text variant='headlineSmall' style={[styles.user, { textAlign: 'right', fontSize, color: '#a2cf6e', opacity: colorOpacity }]}>{userDetails[0].name}</Animated.Text>
+                  <View style={{ width: 350, alignItems: 'center'}}>
+                    <Avatar.Image size={100} style={{ alignSelf: 'center'}} source={{uri: userDetails[1]['clientInfo'].picture}} />
+                    <Animated.Text variant='headlineSmall' style={[styles.user, {  fontSize, color: '#a2cf6e', opacity: colorOpacity }]}>{userDetails[1].clientInfo.name}</Animated.Text>
                   </View>
                   <View style={{ width: 100 }}>
                     <Text variant='displayLarge' style={styles.vs}>Vs</Text>
                   </View>
-                  <View style={{ width: 350 }}>
-                    <Animated.Text variant='headlineSmall' style={[styles.user, { textAlign: 'left', fontSize, color: '#ff9800', opacity: colorOpacity }]}>{userDetails[1].name}</Animated.Text>
+                  <View style={{ width: 350, alignItems: 'center' }}>
+                    <Avatar.Image size={100} style={{ alignSelf: 'center'}} source={{uri: userDetails[2]['clientInfo'].picture}} />
+                    <Animated.Text variant='headlineSmall' style={[styles.user, { fontSize, color: '#ff9800', opacity: colorOpacity }]}>{userDetails[2].clientInfo.name}</Animated.Text>
                   </View>
                 </View>
               )
@@ -148,8 +156,7 @@ const styles = StyleSheet.create({
   loader: {
     justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'row',
-    columnGap: 20
+    flexDirection: 'row'
   },
   user: {
     marginBottom: 50,
@@ -169,6 +176,10 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 5, height: 5 },
     textShadowRadius: 10
+  }, playerImg: {
+    width: 200,
+    height: 200,
+    borderRadius: 200 / 2
   }
 })
 

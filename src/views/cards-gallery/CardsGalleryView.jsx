@@ -1,5 +1,5 @@
-import React, { useContext, useMemo, useState } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, View, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { SafeAreaView, StatusBar, StyleSheet, View, ToastAndroid, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux'
 import TMButton from '../../components/buttons/ButtonComponent';
@@ -13,10 +13,23 @@ const coverColor = '#ccc';
 
 const CardsGalleryView = ({ stats, type, navigation }) => {
   const collection = useSelector(state => state.cricketCards.data);
+  const clientInfo = useSelector(state => state.user.data);
+
   const socket = useContext(SocketContext);
   const [selectedCard, setSelectedCard] = useState(undefined);
+  const [selectedTeamCard, setSelectedTeamCard] = useState(undefined);
+
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    socket.on("show-preload", (args, cb) => {
+      if (args) {
+        ToastAndroid.show(args.error, ToastAndroid.SHORT)
+      } else {
+        navigation.navigate('PreGameLoader');
+      }
+    });
+  }, []);
 
   const galleryHeader = () => {
     return (
@@ -51,7 +64,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                 dispatch(addToTeam({ tmId: id, slotId: vacantPlayerId }));
               }}
             />
-             <View style={{ width: 9 }} />
+            <View style={{ width: 9 }} />
           </>
         )
       }}
@@ -60,32 +73,36 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
   }
   const selectedPlayerData = useMemo(() => {
     return listData ? listData.find(card => card.TMID === selectedCard) : {}
-  }, [selectedCard]);
+  }, [selectedCard, selectedTeamCard]);
 
   const canStartPlay = useMemo(() => {
     return collection && Object.values(JSON.parse(JSON.stringify(collection.playingCards))).length <= 2
   }, [collection]);
+
   return (
     <TouchableOpacity
       onPress={() => {
         setSelectedCard(undefined)
+        setSelectedTeamCard(undefined)
       }}
       activeOpacity={1}
       style={styles.background}
     >
-      <ImageBackground source={require('./../../../assets/background1.png')} resizeMode="cover" style={styles.background}>
+      <ImageBackground source={require('./../../../assets/background4.png')} resizeMode="cover" style={styles.background}>
         <SafeAreaView style={styles.container}>
           <View style={styles.galleryLeft}>
             {galleryHeader()}
-            {listData && listData.length ? renderList() : <Text style={styles.noCards}>No Cards Available!</Text>}
+            {listData && listData.length ? renderList() :
+              <Text style={styles.noCards}>No Cards Available!</Text>
+            }
           </View>
           <View style={styles.galleryRight}>
             {
-              selectedCard ? (
-                <CardDetailsView playerData={selectedPlayerData} />
+              selectedCard || selectedTeamCard ? (
+                <CardDetailsView playerData={selectedPlayerData || selectedTeamCard} />
               ) : (
                 <>
-                  <TeamView stats={stats} socket={socket} />
+                  <TeamView stats={stats} socket={socket} onTeamCardSelect={(item) => setSelectedTeamCard(item)}/>
                   <TMButton
                     label="Play Now"
                     type={'success'}
@@ -93,8 +110,12 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                     disabled={canStartPlay}
                     labelStyle={styles.playNowLabel}
                     onPressHandler={() => {
-                      socket.emit('cricket-new');
-                      navigation.navigate('PreGameLoader');
+                      socket.emit('new-game', {
+                        gameState: {
+                          availableCards: collection.playingCards
+                        },
+                        clientInfo
+                      });
                     }}
                   />
                 </>
@@ -119,15 +140,17 @@ const styles = StyleSheet.create({
   },
   playNow: {
     width: "100%",
-    marginTop: 15,
-    color: '#ccc'
+    marginTop: 25,
+    color: '#ccc',
+    backgroundColor: 'rgba(0,200,0,0.5)'
   },
   galleryLeft: {
     width: '50%'
   },
   galleryRight: {
     alignItems: 'center',
-    width: '40%'
+    width: '40%',
+    marginRight: 15
   },
   playNowLabel: {
     fontWeight: 'bold',
@@ -142,7 +165,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noCards: {
-    fontStyle: 'italic'
+    fontStyle: 'italic',
+    color: '#eee'
   },
   galleryHeader: {
     height: 30,

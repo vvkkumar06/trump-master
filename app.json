@@ -4,7 +4,7 @@
     "slug": "trump-master",
     "scheme": "trumpmaster",
     "version": "1.0.0",
-    "orientation": "landscape",
+    "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -34,5 +34,9 @@
         "projectId": "c7bccbb1-0d21-4230-a2db-1c8294312999"
       }
     }
+  },
+  "jsEngine": "hermes",
+  "ios": {
+    "jsEngine": "jsc"
   }
 }

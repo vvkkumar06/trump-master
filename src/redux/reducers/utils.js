@@ -37,3 +37,7 @@ export const transformTeamToPlayingCards = (data, stats) => {
   }
   return team;
 }
+
+export const getCardDetailsFromTmId = (id, stats) => {
+  return stats.find(item => item.TMID == id);
+}
