@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useFetchCricketCollectionQuery, useFetchStatsQuery } from '../../redux/features/api';
+import { useFetchStatsQuery, useFetchUserQuery } from '../../redux/features/api';
 import { updateCricketCards } from '../../redux/features/cricket-slice';
 import CardsGalleryView from '../cards-gallery/CardsGalleryView';
 
 
 const DashboardView = ({navigation}) => {
   const { data: cricketStats } = useFetchStatsQuery();
-  const { data: cricketCollection } = useFetchCricketCollectionQuery();
+  const { data: userData } = useFetchUserQuery()
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(updateCricketCards(cricketCollection))
-  }, [cricketCollection])
+    dispatch(updateCricketCards(userData.games.cricket))
+  }, [userData.games.cricket])
 
   return (
     <>

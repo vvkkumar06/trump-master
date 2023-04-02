@@ -1,19 +1,21 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import {getData} from './../reducers/utils'
 
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://192.168.29.168:8080/api/'
+    baseUrl: 'http://192.168.29.168:8080/api/',
+    prepareHeaders: async (headers) => {
+      const token = await getData('token');
+      headers.set('Authorization',`Bearer ${token}`)
+      return headers
+  }
   }),
-  tagTypes: ['CricketCards', 'Stats'],
+  tagTypes: ['CricketCards', 'Stats', 'User'],
   endpoints: (builder) => ({
     fetchStats: builder.query({
       query: () => 'cricket/stats',
       providesTags: ['Stats']
-    }),
-    fetchCricketCollection: builder.query({
-      query: () => 'cricket/collection',
-      providesTags: ['CricketCards']
     }),
     updateCricketCollection: builder.mutation({
       query: (body) => {
@@ -22,9 +24,21 @@ export const api = createApi({
         method: 'PUT',
         body
       }},
-      invalidatesTags: ['CricketCards'],
+      invalidatesTags: ['User'],
+    }),
+    fetchUser: builder.query({
+      query: () => 'user',
+      providesTags: ['User']
+    }),
+    // Authentication
+    login: builder.mutation({
+      query: (body) => {
+        return {
+        url: `auth/login`,
+        method: 'POST',
+        body
+      }},
     }),
   }),
 })
-
-export const { useFetchCricketCollectionQuery, useFetchStatsQuery, useUpdateCricketCollectionMutation } = api;
+export const { useFetchStatsQuery, useUpdateCricketCollectionMutation, useLoginMutation, useFetchUserQuery } = api;

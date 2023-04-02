@@ -9,11 +9,12 @@ import { findVacantPlayer, transformCollectionToList } from '../../redux/reducer
 import SocketContext from '../../utils/SocketContext';
 import CardDetailsView from '../detail/CardDetailsView';
 import TeamView from '../team/TeamView';
+import { useFetchUserQuery } from '../../redux/features/api';
 const coverColor = '#ccc';
 
 const CardsGalleryView = ({ stats, type, navigation }) => {
   const collection = useSelector(state => state.cricketCards.data);
-  const clientInfo = useSelector(state => state.user.data);
+  const { data: clientInfo } = useFetchUserQuery();
 
   const socket = useContext(SocketContext);
   const [selectedCard, setSelectedCard] = useState(undefined);
