@@ -23,7 +23,6 @@ export default StyleSheet.create({
     borderWidth: 5,
     borderStyle: 'solid',
     borderColor: '#ccc',
-    backgroundColor: '#162',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -44,7 +43,7 @@ export default StyleSheet.create({
   },
   cardContainer: {
     width: 110,
-    margin: 2,
+    margin: 4,
     height: 160
   },
   cardsContainer: {
@@ -133,7 +132,7 @@ export default StyleSheet.create({
   },
   roundBadge: {
     margin: 2,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#ccc'
   }
 });

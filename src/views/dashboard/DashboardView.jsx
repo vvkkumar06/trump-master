@@ -11,7 +11,7 @@ const DashboardView = ({navigation}) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(updateCricketCards(userData.games.cricket))
+    dispatch(updateCricketCards(userData.games && userData.games.cricket))
   }, [userData.games.cricket])
 
   return (

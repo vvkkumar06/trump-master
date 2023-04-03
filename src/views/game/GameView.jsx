@@ -100,7 +100,7 @@ const GameView = ({ route, navigation }) => {
       useNativeDriver: false,
       toValue: 1,
       easing: Easing.ease,
-      duration: 2000
+      duration: 1000
     }).start(cb);
   }
 
@@ -116,13 +116,8 @@ const GameView = ({ route, navigation }) => {
       roundFontSize.setValue(0);
       questionOpacity.setValue(0);
       setRoundQuestion(Object.values(roundInfo.question)[0]);
+      setRecommendedMove(roundInfo.recommendedMove);
       setNextRound(nextRound);
-      preRoundAnimation(() => {
-        setRecommendedMove(roundInfo.recommendedMove);
-        setP1Time(30);
-        setP2Time(30);
-        setDisableDrag(false);
-      })
     });
     socket.on('game-over', ({ gameState, winner }) => {
       winnerFontSize.setValue(0);
@@ -144,12 +139,15 @@ const GameView = ({ route, navigation }) => {
 
   useEffect(() => {
     if (nextRound) {
-      setTimeout(() => {
-        setPlayer1(undefined);
-        setPlayer2Move(undefined);
-        setRemoveCard(undefined);
-        setResult(undefined);
-      }, nextRound !== 1 ? 3000 : 1000);
+      setPlayer1(undefined);
+      setPlayer2Move(undefined);
+      setRemoveCard(undefined);
+      setResult(undefined);
+      setDisableDrag(false);
+      preRoundAnimation(() => {
+        setP1Time(30);
+        setP2Time(30);
+      })
     }
   }, [nextRound])
 
@@ -213,6 +211,8 @@ const GameView = ({ route, navigation }) => {
         return 'green';
       } else if (status && (status === 'L')) {
         return 'red';
+      } else if(status && (status === 'T')){
+        return 'orange';
       } else {
         return 'transparent';
       }
@@ -273,9 +273,12 @@ const GameView = ({ route, navigation }) => {
                   />
                 </View>
               ) : (
-                <Text style={{ color: '#bbb', fontWeight: 'bold' }}>
-                  You
-                </Text>
+                <View style={[
+                { width: '100%', height: '100%', backgroundColor: 'darkgreen', justifyContent: 'center', alignItems: 'center' }]}>
+                  <Text style={{ color: '#bbb', fontWeight: 'bold' }}>
+                    You
+                  </Text>
+                </View>
               )
             }
 
@@ -319,18 +322,21 @@ const GameView = ({ route, navigation }) => {
                     height="110"
                   />
                 </View>) : (
-                <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', position: 'relative'}}>
+                <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
                   <ImageBackground source={require('./../../../assets/card-backface.jpg')} resizeMode="cover" style={{ width: '100%', height: '100%' }} />
                   <Image
-                   style={{width: 50, height: 50, position: 'absolute'}}
+                    style={{ width: 50, height: 50, position: 'absolute' }}
                     source={require('./../../../assets/images/app-icons/logo.png')}
                   />
                 </View>
 
               )) : (
-                <Text style={{ color: '#bbb', fontWeight: 'bold' }}>
-                  Opponent
-                </Text>
+                <View style={[
+                  { width: '100%', height: '100%', backgroundColor: 'darkred', justifyContent: 'center', alignItems: 'center' }]}>
+                    <Text style={{ color: '#bbb', fontWeight: 'bold' }}>
+                      Opponent
+                    </Text>
+                  </View>
               )
 
             }

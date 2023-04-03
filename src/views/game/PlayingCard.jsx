@@ -42,7 +42,9 @@ const PlayingCard = ({onCardDrop, data, cardName, recommendedCard, onDragStart, 
 
     useEffect(() => {
         if(recommendedCard === cardName) {
-            moveCardUp();
+            setTimeout(() => {
+                moveCardUp();
+            }, 3000)
         }
     }, [recommendedCard])
 
@@ -52,7 +54,7 @@ const PlayingCard = ({onCardDrop, data, cardName, recommendedCard, onDragStart, 
             toValue: !isOut ? { x: 0, y: -80 } : { x: 0, y: -5 },
             useNativeDriver: false,
             easing: Easing.elastic(1.2),
-            duration: 1000
+            duration: 800
         }).start();
         setIsOut(out => !out);
     }
