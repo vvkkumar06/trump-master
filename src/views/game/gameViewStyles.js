@@ -23,7 +23,6 @@ export default StyleSheet.create({
     borderWidth: 5,
     borderStyle: 'solid',
     borderColor: '#ccc',
-    backgroundColor: '#162',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -35,7 +34,6 @@ export default StyleSheet.create({
     borderWidth: 5,
     borderStyle: 'solid',
     borderColor: '#ccc',
-    backgroundColor: '#612',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -45,7 +43,7 @@ export default StyleSheet.create({
   },
   cardContainer: {
     width: 110,
-    margin: 2,
+    margin: 4,
     height: 160
   },
   cardsContainer: {
@@ -67,7 +65,7 @@ export default StyleSheet.create({
   },
   topDesign: {
     width: '100%',
-    height: 50,
+    height: 53,
     marginHorizontal: 20,
     top: -20,
     position: 'absolute',
@@ -87,7 +85,7 @@ export default StyleSheet.create({
     borderLeftWidth: 0,
     borderRightWidth: 10,
     paddingLeft: 15,
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
   },
   topRightLine: {
@@ -102,7 +100,7 @@ export default StyleSheet.create({
     borderRightWidth: 0,
     borderLeftWidth: 10,
     paddingLeft: 5,
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
   },
   centerLine: {
@@ -119,22 +117,22 @@ export default StyleSheet.create({
     justifyContent: 'center'
   },
   roundInfo1: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-end',
-    height: '90%',
-    marginLeft: 5
-  },
-  roundInfo2: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
-    height: '90%',
+    height: '30%',
+    marginLeft: 5,
+  },
+  roundInfo2: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    height: '30%',
     marginLeft: 5
   },
   roundBadge: {
     margin: 2,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#ccc'
   }
 });

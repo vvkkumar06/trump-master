@@ -1,18 +1,19 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ImageBackground, View, Image } from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { StyleSheet } from 'react-native';
-import { Button } from 'react-native-paper'
-import { useDispatch } from 'react-redux';
-import { setUserDetails } from '../../redux/features/user-slice';
+import { Button, Text } from 'react-native-paper'
+import { api, useFetchUserQuery, useLoginMutation } from '../../redux/features/api';
+import { storeData } from '../../redux/reducers/utils';
+import AnimatedLoader from "react-native-animated-loader";
 
-//614960213278-9j7hiauqfg9gibauk358r9cc14avh3mb.apps.googleusercontent.com
 const LoginView = () => {
-  const [userInfo, setUserInfo] = useState(null);
-  const dispatch = useDispatch()
+  const  [fetchUser, userData] = api.endpoints.fetchUser.useLazyQuery();
+  const userInfo =  userData.data;
+  const [Login, result] = useLoginMutation();
+  const [showLoader, setShowLoader] = useState(false);
 
-  const [request, response, promptAsync] =  Google.useAuthRequest({
+  const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: "614960213278-9j7hiauqfg9gibauk358r9cc14avh3mb.apps.googleusercontent.com",
     expoClientId: '614960213278-9j7hiauqfg9gibauk358r9cc14avh3mb.apps.googleusercontent.com',
     webClientId: '614960213278-3f6metee1kgd1fv1a62n9q2l9so73kjm.apps.googleusercontent.com',
@@ -22,52 +23,60 @@ const LoginView = () => {
 
   useEffect(() => {
     if (response?.type === "success") {
-      getUserInfo(response.authentication.accessToken);
+      console.log('Signing In');
+      Login({ token: response.authentication.idToken });
     }
   }, [response]);
-  
-  const getUserInfo = async (token) => {
-    try {
-      const response = await fetch(
-        "https://www.googleapis.com/userinfo/v2/me",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-        );
-        
-        const user = await response.json();
 
-      setUserInfo(user);
-      dispatch(setUserDetails(user))
-    } catch (error) {
-      // Add your own error handler here
+  useEffect(() => {
+    async function setUserData() {
+      if (result.data) {
+        const jwtToken = result.data.token;
+        if (jwtToken) {
+          console.log('Saving token');
+          await storeData('token', jwtToken)
+          fetchUser();
+        }
+      }
     }
-  };
+    setUserData();
+  }, [result.data]);
+
   return (
     <ImageBackground source={require('./../../../assets/background3.png')} resizeMode="cover" style={styles.background}>
-      <SafeAreaView style={styles.container}>
-        {userInfo === null ? (
-          <>
-            <View style={styles.logoContainer}>
-              <Image
-                style={styles.logo}
-                source={require('./../../../assets/images/app-icons/logo.png')}
-              />
-            </View>
+      {
+        (!userInfo || (userInfo.error))&& !showLoader ? <SafeAreaView style={styles.container}>
+          <View style={styles.logoContainer}>
+            <Image
+              style={styles.logo}
+              source={require('./../../../assets/images/app-icons/logo.png')}
+            />
+          </View>
 
-            <Button
-              mode="outlined"
-              icon="google"
-              contentStyle={{ width: 200, height: 60, backgroundColor: '#b71c1c', opacity: 0.8 }}
-              labelStyle={{ paddingTop: 20, fontSize: 32, color: '#ddd' }}
-              disabled={!request}
-              onPress={() => {
-                promptAsync();
-              }}
-            > Login</Button>
-          </>
-        ) : undefined}
-      </SafeAreaView>
+          <Button
+            mode="outlined"
+            icon="google"
+            contentStyle={{ width: 200, height: 60, backgroundColor: '#b71c1c', opacity: 0.8 }}
+            labelStyle={{ paddingTop: 20, fontSize: 32, color: '#ddd' }}
+            disabled={!request}
+            onPress={() => {
+              setShowLoader(true)
+              promptAsync();
+            }}
+          > Login</Button>
+        </SafeAreaView> :
+          <View style={{ justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}>
+            <AnimatedLoader
+              visible={true}
+              overlayColor='transparent'
+              source={require("./../../assets/loaders/app.json")}
+              animationStyle={{ width: 250, height: 250 }}
+              speed={1}
+            >
+              <Text variant="headlineSmall">Loading...</Text>
+            </AnimatedLoader>
+          </View>
+      }
     </ImageBackground >
   );
 }

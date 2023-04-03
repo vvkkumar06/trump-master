@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export const findVacantPlayer = (data) => {
   if (!data['card1']) {
     return 'card1'
@@ -19,7 +21,7 @@ export const findVacantPlayer = (data) => {
 
 export const transformCollectionToList = (data, stats) => {
   const list = [];
-  data && stats && 
+  data && stats &&
     Object.keys(data).forEach(key => {
       for (let i = 0; i < data[key].count; i++) {
         list.push(stats.find(item => item.TMID == key));
@@ -30,8 +32,8 @@ export const transformCollectionToList = (data, stats) => {
 
 export const transformTeamToPlayingCards = (data, stats) => {
   const team = {};
-  if(data && stats) {
-    for(let key in data) {
+  if (data && stats) {
+    for (let key in data) {
       team[key] = stats.find(item => item.TMID == data[key]);
     }
   }
@@ -40,4 +42,21 @@ export const transformTeamToPlayingCards = (data, stats) => {
 
 export const getCardDetailsFromTmId = (id, stats) => {
   return stats.find(item => item.TMID == id);
+}
+
+export const storeData = async (key, value) => {
+  try {
+    await AsyncStorage.setItem(key, value)
+  } catch (e) {
+    console.log('Problem saving data to store')
+  }
+}
+
+export const getData = async (key) => {
+  try {
+    const value = await AsyncStorage.getItem(key)
+    return value;
+  } catch(e) {
+    console.log("Error reading data from store")
+  }
 }

@@ -17,14 +17,16 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.vijyo.tm"
+      "bundleIdentifier": "com.vijyo.tm",
+      "jsEngine": "jsc"
     },
     "android": {
       "package": "com.vijyo.tm",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "jsEngine": "hermes"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,9 +36,5 @@
         "projectId": "c7bccbb1-0d21-4230-a2db-1c8294312999"
       }
     }
-  },
-  "jsEngine": "hermes",
-  "ios": {
-    "jsEngine": "jsc"
   }
 }

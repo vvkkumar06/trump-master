@@ -1,10 +1,10 @@
-import React, { useMemo, useState, useRef, useEffect } from 'react';
+import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { Animated, Easing, PanResponder, TouchableOpacity } from 'react-native';
 import PlayerComponent from '../../components/PlayerComponent';
 import { CricketPlayerDisplayProps } from '../../utils/display-properties';
 import styles from './gameViewStyles';
 
-const PlayingCard = ({onCardDrop, data, cardName, recommendedCard, onDragStart, isDragDisabled, gameState, playingCards }) => {
+const PlayingCard = ({onCardDrop, data, cardName, recommendedCard, onDragStart, isDragDisabled }) => {
     const [isOut, setIsOut] = useState(false);
     const pan = useRef(new Animated.ValueXY({ x: 0, y: -5 })).current;
     
@@ -23,7 +23,7 @@ const PlayingCard = ({onCardDrop, data, cardName, recommendedCard, onDragStart, 
         },
         onPanResponderRelease: (e, gestureState) => {
             if (gestureState.moveX < 180 && gestureState.moveY < 250) {
-                onCardDrop && onCardDrop(data, cardName, gameState, playingCards);
+                onCardDrop && onCardDrop(cardName);
             } else {
                 pan.setOffset({ x: 0, y: 0 })
                 Animated.spring(
@@ -38,24 +38,26 @@ const PlayingCard = ({onCardDrop, data, cardName, recommendedCard, onDragStart, 
 
         }
 
-    }), [data, cardName, gameState, playingCards]);
+    }), [onCardDrop]);
 
     useEffect(() => {
         if(recommendedCard === cardName) {
-            moveCardUp();
+            setTimeout(() => {
+                moveCardUp();
+            }, 3000)
         }
     }, [recommendedCard])
 
 
-    const moveCardUp = () => {
+    const moveCardUp = useCallback(() => {
         Animated.timing(pan, {
             toValue: !isOut ? { x: 0, y: -80 } : { x: 0, y: -5 },
             useNativeDriver: false,
             easing: Easing.elastic(1.2),
-            duration: 1000
+            duration: 800
         }).start();
         setIsOut(out => !out);
-    }
+    }, []);
 
     if (data) {
         return (
@@ -74,4 +76,4 @@ const PlayingCard = ({onCardDrop, data, cardName, recommendedCard, onDragStart, 
     }
 }
 
-export default PlayingCard;
+export default React.memo(PlayingCard);

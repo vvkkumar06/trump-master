@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Easing, ImageBackground, Text, View } from 'react-native';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { Easing, Image, ImageBackground, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native';
 import { getCardDetailsFromTmId, transformTeamToPlayingCards } from '../../redux/reducers/utils';
 import { useFetchStatsQuery } from '../../redux/features/api';
@@ -10,6 +10,8 @@ import { CricketPlayerDisplayProps } from '../../utils/display-properties';
 import SocketContext from '../../utils/SocketContext';
 import { Animated } from 'react-native';
 import { Avatar, Badge } from 'react-native-paper';
+import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
+
 
 const GameView = ({ route, navigation }) => {
   const socket = useContext(SocketContext);
@@ -18,12 +20,14 @@ const GameView = ({ route, navigation }) => {
   const [roundQuestion, setRoundQuestion] = useState('');
   const [recommendedMove, setRecommendedMove] = useState(undefined);
   const [opponentId, setOpponentId] = useState(undefined);
+  const [p1Time, setP1Time] = useState(0);
+  const [p2Time, setP2Time] = useState(0);
   const { userDetails } = route.params || {};
 
   const players = useMemo(() => {
     const players = {};
-    if(userDetails && userDetails[1] && userDetails[2]){
-      if(userDetails[1].clientId === socket.id) {
+    if (userDetails && userDetails[1] && userDetails[2]) {
+      if (userDetails[1].clientId === socket.id) {
         players['p1'] = userDetails[1].clientInfo;
         players['p2'] = userDetails[2].clientInfo;
         setOpponentId(userDetails[2].clientId);
@@ -32,7 +36,7 @@ const GameView = ({ route, navigation }) => {
         players['p2'] = userDetails[1].clientInfo;
         setOpponentId(userDetails[1].clientId)
       }
-    } 
+    }
     return players;
   }, [userDetails]);
 
@@ -42,7 +46,7 @@ const GameView = ({ route, navigation }) => {
   const [removeCard, setRemoveCard] = useState(undefined);
   const [gameState, setGameState] = useState(undefined);
   const [result, setResult] = useState(undefined);
-  const [disableDrag, setDisableDrag] = useState(false);
+  const [disableDrag, setDisableDrag] = useState(true);
   const [winner, setWinner] = useState(undefined);
 
 
@@ -53,7 +57,19 @@ const GameView = ({ route, navigation }) => {
   const resultOpacity = useRef(new Animated.Value(0)).current;
 
 
-  const preRoundAnimation = (cb) => {
+  const getTimer = useCallback((time) => (
+    <CountdownCircleTimer
+      isPlaying
+      strokeWidth={6}
+      size={50}
+      duration={time}
+      colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+      colorsTime={[time - time / 4, time - time / 2, time - time * 3 / 4, 0]}
+    />
+  ),[]);
+
+
+  const preRoundAnimation = useCallback((cb) => {
     Animated.sequence([
       Animated.timing(roundFontSize, {
         useNativeDriver: false,
@@ -68,25 +84,25 @@ const GameView = ({ route, navigation }) => {
         duration: 1000,
       })
     ]).start(cb);
-  }
+  }, [])
 
-  const postRoundAnimation = (cb) => {
+  const postRoundAnimation = useCallback((cb) => {
     Animated.timing(winnerFontSize, {
       useNativeDriver: false,
       toValue: 36,
       easing: Easing.bounce,
       duration: 3000
     }).start(cb);
-  }
+  }, []);
 
-  const resultAnimation = (cb) => {
+  const resultAnimation = useCallback((cb) => {
     Animated.timing(resultOpacity, {
       useNativeDriver: false,
       toValue: 1,
       easing: Easing.ease,
-      duration: 2000
+      duration: 1000
     }).start(cb);
-  }
+  }, []);
 
   useEffect(() => {
     socket.emit('start-game');
@@ -95,13 +111,13 @@ const GameView = ({ route, navigation }) => {
       args.winner && setWinner(args.winner);
     });
     socket.on('request-move', ({ nextRound, roundInfo }) => {
+      setP1Time(0);
+      setP2Time(0);
       roundFontSize.setValue(0);
       questionOpacity.setValue(0);
       setRoundQuestion(Object.values(roundInfo.question)[0]);
+      setRecommendedMove(roundInfo.recommendedMove);
       setNextRound(nextRound);
-      preRoundAnimation(() => {
-        setRecommendedMove(roundInfo.recommendedMove);
-      })
     });
     socket.on('game-over', ({ gameState, winner }) => {
       winnerFontSize.setValue(0);
@@ -123,13 +139,15 @@ const GameView = ({ route, navigation }) => {
 
   useEffect(() => {
     if (nextRound) {
-      setTimeout(() => {
-        setPlayer1(undefined);
-        setPlayer2Move(undefined);
-        setDisableDrag(false);
-        setRemoveCard(undefined);
-        setResult(undefined);
-      }, nextRound !== 1 ? 3000 : 1000);
+      setPlayer1(undefined);
+      setPlayer2Move(undefined);
+      setRemoveCard(undefined);
+      setResult(undefined);
+      setDisableDrag(false);
+      preRoundAnimation(() => {
+        setP1Time(30);
+        setP2Time(30);
+      })
     }
   }, [nextRound])
 
@@ -161,9 +179,9 @@ const GameView = ({ route, navigation }) => {
     }
   }, [gameState, nextRound, removeCard])
 
-  const handleCardDrop = (card, cardName, gameState, playingCards) => {
+  const handleCardDrop = useCallback((cardName) => {
     // Set selected player
-    setPlayer1(card);
+    setPlayer1(playingCards[cardName]);
 
     //removed card from deck
     setRemoveCard(cardName);
@@ -178,56 +196,70 @@ const GameView = ({ route, navigation }) => {
     if (!state.move) {
       state.move = {};
     }
-    state.move[nextRound] = card.TMID;
+    state.move[nextRound] = playingCards[cardName].TMID;
     socket.emit('move', state);
-
     //disable drag
     setDisableDrag(true);
-  }
+  }, [playingCards]);
 
-  const getRoundColor = (round, isOpponent) => {
+  const getRoundColor = useCallback((round, isOpponent) => {
     const id = isOpponent ? opponentId : socket.id;
-    if(id && gameState) {
+    if (id && gameState) {
       const status = gameState[id].result[round];
-      if(status && (status  === 'W')) {
+      if (status && (status === 'W')) {
         return 'green';
-      } else if(status && (status  === 'L')) {
+      } else if (status && (status === 'L')) {
         return 'red';
+      } else if(status && (status === 'T')){
+        return 'orange';
       } else {
         return 'transparent';
       }
     }
     return 'transparent';
-  }
+  }, [gameState]);
 
   return (
     <ImageBackground source={require('./../../../assets/background4.png')} resizeMode="cover" style={styles.background}>
       <SafeAreaView style={styles.container}>
         <View style={styles.topDesign}>
           <View style={styles.topLeftLine} >
-            {players['p1'] && <Avatar.Image size={40} source={{ uri: players['p1'].picture }} />}
+            <View style={{ width: 20, height: 20, marginRight: 20, marginLeft: 20, marginBottom: 35, alignItems: 'center' }}>
+              {p1Time && !player1 ? getTimer(p1Time) : <></>}
+              {players['p1'] && <Avatar.Image size={40} source={{ uri: players['p1'].picture }} style={{ position: 'absolute', marginTop: 5 }} />}
+            </View>
+            {players['p1'] && <Text style={{ color: 'white', position: 'absolute', left: 80, bottom: 0 }}>{players['p1'].name}</Text>}
+
             <View style={styles.roundInfo1}>
-              <Badge key="p1-r1" style={[styles.roundBadge, {backgroundColor: getRoundColor(1)}]} size={15} />
-              <Badge key="p1-r2" style={[styles.roundBadge, {backgroundColor: getRoundColor(2)}]} size={15}/>
-              <Badge key="p1-r3" style={[styles.roundBadge, {backgroundColor: getRoundColor(3)}]} size={15}/>
+              <Badge key="p1-r1" style={[styles.roundBadge, { backgroundColor: getRoundColor(1) }]} size={15} />
+              <Badge key="p1-r2" style={[styles.roundBadge, { backgroundColor: getRoundColor(2) }]} size={15} />
+              <Badge key="p1-r3" style={[styles.roundBadge, { backgroundColor: getRoundColor(3) }]} size={15} />
             </View>
           </View>
           <View style={styles.centerLine}>
-            {!result && (<Animated.Text style={[styles.roundText, { color: 'yellow', fontSize: 36 }]}>
-              ROUND {nextRound}
-            </Animated.Text>)}
+            {!result && (
+              <Animated.Text style={[styles.roundText, { color: 'yellow', fontSize: 36 }]}>
+                ROUND {nextRound}
+              </Animated.Text>
+            )}
           </View>
           <View style={styles.topRightLine} >
-          {players['p2'] && <Avatar.Image size={40} source={{ uri: players['p2'].picture }} />}
-          <View style={styles.roundInfo2}>
-              <Badge key="p2-r1" style={[styles.roundBadge, {backgroundColor: getRoundColor(1, true)}]} size={15}/>
-              <Badge key="p2-r2" style={[styles.roundBadge, {backgroundColor: getRoundColor(2, true)}]} size={15}/>
-              <Badge key="p2-r3" style={[styles.roundBadge, {backgroundColor: getRoundColor(3, true)}]} size={15}/>
+            <View style={{ width: 20, height: 20, marginRight: 20, marginLeft: 20, marginBottom: 35, alignItems: 'center' }}>
+              {p2Time && !player2Move ? getTimer(p2Time) : <></>}
+              {players['p2'] && <Avatar.Image size={40} source={{ uri: players['p2'].picture }} style={{ position: 'absolute', marginTop: 5 }} />}
+            </View>
+            {players['p2'] && <Text style={{ color: 'white', position: 'absolute', left: 65, bottom: 0 }}>{players['p2'].name}</Text>}
+
+            <View style={styles.roundInfo2}>
+              <Badge key="p2-r1" style={[styles.roundBadge, { backgroundColor: getRoundColor(1, true) }]} size={15} />
+              <Badge key="p2-r2" style={[styles.roundBadge, { backgroundColor: getRoundColor(2, true) }]} size={15} />
+              <Badge key="p2-r3" style={[styles.roundBadge, { backgroundColor: getRoundColor(3, true) }]} size={15} />
             </View>
           </View>
         </View>
         <View style={styles.selectedContainer}>
-          <View style={[styles.player1SelectedContainer, , { width: 80, height: 120 }]}>
+          <View style={[styles.player1SelectedContainer,
+          { width: 80, height: 120 }]}>
             {
               player1 ? (
                 <View key={'player1'} style={[styles.cardContainer, { width: 70, height: 110 }]} >
@@ -240,9 +272,12 @@ const GameView = ({ route, navigation }) => {
                   />
                 </View>
               ) : (
-                <Text style={{ color: '#bbb', fontWeight: 'bold' }}>
-                  You
-                </Text>
+                <View style={[
+                { width: '100%', height: '100%', backgroundColor: 'darkgreen', justifyContent: 'center', alignItems: 'center' }]}>
+                  <Text style={{ color: '#bbb', fontWeight: 'bold' }}>
+                    You
+                  </Text>
+                </View>
               )
             }
 
@@ -257,7 +292,6 @@ const GameView = ({ route, navigation }) => {
                 </Animated.Text>
               ) : (
                 <>
-
                   {
                     result ? (
                       <Animated.Text style={[styles.roundText, { fontSize: 24, color: result.includes('Won') ? 'green' : 'red', opacity: resultOpacity }]}>
@@ -277,7 +311,7 @@ const GameView = ({ route, navigation }) => {
           </View>
           <View style={[styles.player2SelectedContainer, { width: 80, height: 120 }]}>
             {
-              player2Move ? (
+              player2Move ? (player1 ? (
                 <View key={'player2'} style={[styles.cardContainer, { width: 70, height: 110 }]} >
                   <PlayerComponent
                     displayProps={CricketPlayerDisplayProps}
@@ -286,12 +320,24 @@ const GameView = ({ route, navigation }) => {
                     useShortName={true}
                     height="110"
                   />
+                </View>) : (
+                <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+                  <ImageBackground source={require('./../../../assets/card-backface.jpg')} resizeMode="cover" style={{ width: '100%', height: '100%' }} />
+                  <Image
+                    style={{ width: 50, height: 50, position: 'absolute' }}
+                    source={require('./../../../assets/images/app-icons/logo.png')}
+                  />
                 </View>
-              ) : (
-                <Text style={{ color: '#bbb', fontWeight: 'bold', letterSpacing: 1, fontSize: 10 }}>
-                  Opponent
-                </Text>
+
+              )) : (
+                <View style={[
+                  { width: '100%', height: '100%', backgroundColor: 'darkred', justifyContent: 'center', alignItems: 'center' }]}>
+                    <Text style={{ color: '#bbb', fontWeight: 'bold' }}>
+                      Opponent
+                    </Text>
+                  </View>
               )
+
             }
           </View>
         </View>
@@ -305,8 +351,7 @@ const GameView = ({ route, navigation }) => {
               recommendedCard={recommendedMove && recommendedMove[socket.id]}
               onCardDrop={handleCardDrop}
               isDragDisabled={disableDrag}
-              gameState={gameState}
-              playingCards={playingCards} />
+               />
           ))}
         </View>
 

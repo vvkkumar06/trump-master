@@ -3,11 +3,10 @@ import { Provider } from 'react-redux'
 import { Provider as PaperProvider } from 'react-native-paper';
 import SocketContext from './src/utils/SocketContext';
 import 'expo-dev-client';
-import NavigationView from './src/views/navigation/NavigationView';
-import { StatusBar } from 'react-native';
 import { useFonts } from 'expo-font';
 
 import { io } from "socket.io-client";
+import TMMain from './src/views/TMMain';
 const socket = io("http://192.168.29.168:8080");
 export default function App() {
 
@@ -24,8 +23,7 @@ export default function App() {
     <PaperProvider>
       <Provider store={store}>
         <SocketContext.Provider value={socket}>
-          <StatusBar hidden />
-          <NavigationView />
+            <TMMain />
         </SocketContext.Provider>
       </Provider>
     </PaperProvider>
