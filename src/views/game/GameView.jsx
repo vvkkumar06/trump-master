@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Easing, Image, ImageBackground, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native';
 import { getCardDetailsFromTmId, transformTeamToPlayingCards } from '../../redux/reducers/utils';
@@ -57,7 +57,7 @@ const GameView = ({ route, navigation }) => {
   const resultOpacity = useRef(new Animated.Value(0)).current;
 
 
-  const getTimer = (time) => (
+  const getTimer = useCallback((time) => (
     <CountdownCircleTimer
       isPlaying
       strokeWidth={6}
@@ -66,10 +66,10 @@ const GameView = ({ route, navigation }) => {
       colors={['#004777', '#F7B801', '#A30000', '#A30000']}
       colorsTime={[time - time / 4, time - time / 2, time - time * 3 / 4, 0]}
     />
-  )
+  ),[]);
 
 
-  const preRoundAnimation = (cb) => {
+  const preRoundAnimation = useCallback((cb) => {
     Animated.sequence([
       Animated.timing(roundFontSize, {
         useNativeDriver: false,
@@ -84,25 +84,25 @@ const GameView = ({ route, navigation }) => {
         duration: 1000,
       })
     ]).start(cb);
-  }
+  }, [])
 
-  const postRoundAnimation = (cb) => {
+  const postRoundAnimation = useCallback((cb) => {
     Animated.timing(winnerFontSize, {
       useNativeDriver: false,
       toValue: 36,
       easing: Easing.bounce,
       duration: 3000
     }).start(cb);
-  }
+  }, []);
 
-  const resultAnimation = (cb) => {
+  const resultAnimation = useCallback((cb) => {
     Animated.timing(resultOpacity, {
       useNativeDriver: false,
       toValue: 1,
       easing: Easing.ease,
       duration: 1000
     }).start(cb);
-  }
+  }, []);
 
   useEffect(() => {
     socket.emit('start-game');
@@ -179,9 +179,9 @@ const GameView = ({ route, navigation }) => {
     }
   }, [gameState, nextRound, removeCard])
 
-  const handleCardDrop = (card, cardName, gameState, playingCards) => {
+  const handleCardDrop = useCallback((cardName) => {
     // Set selected player
-    setPlayer1(card);
+    setPlayer1(playingCards[cardName]);
 
     //removed card from deck
     setRemoveCard(cardName);
@@ -196,14 +196,13 @@ const GameView = ({ route, navigation }) => {
     if (!state.move) {
       state.move = {};
     }
-    state.move[nextRound] = card.TMID;
+    state.move[nextRound] = playingCards[cardName].TMID;
     socket.emit('move', state);
-
     //disable drag
     setDisableDrag(true);
-  }
+  }, [playingCards]);
 
-  const getRoundColor = (round, isOpponent) => {
+  const getRoundColor = useCallback((round, isOpponent) => {
     const id = isOpponent ? opponentId : socket.id;
     if (id && gameState) {
       const status = gameState[id].result[round];
@@ -218,7 +217,7 @@ const GameView = ({ route, navigation }) => {
       }
     }
     return 'transparent';
-  }
+  }, [gameState]);
 
   return (
     <ImageBackground source={require('./../../../assets/background4.png')} resizeMode="cover" style={styles.background}>
@@ -352,8 +351,7 @@ const GameView = ({ route, navigation }) => {
               recommendedCard={recommendedMove && recommendedMove[socket.id]}
               onCardDrop={handleCardDrop}
               isDragDisabled={disableDrag}
-              gameState={gameState}
-              playingCards={playingCards} />
+               />
           ))}
         </View>
 
