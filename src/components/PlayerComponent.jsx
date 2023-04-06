@@ -35,7 +35,7 @@ const PlayerComponent = ({ displayProps, playerData, coverColor, topStyle, idSty
       textAlign: 'center', textTransform: 'uppercase', fontWeight: 'bold',
       backgroundColor: '#333', color: '#eee', fontStyle: 'italic',
       fontSize: getFontSize(height, 16),
-    }}>{!useShortName ? playerData.PlayerName : getShortName(playerData.PlayerName)}</Text>
+    }}>{!useShortName && playerData.PlayerName.length < 13 ? playerData.PlayerName : getShortName(playerData.PlayerName)}</Text>
     <View style={{
       justifyContent: 'space-between', flexDirection: 'row', 
       flexWrap: 'wrap', backgroundColor: '#eee', alignContent: 'space-between', 

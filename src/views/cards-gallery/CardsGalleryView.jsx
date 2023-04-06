@@ -103,7 +103,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                 <CardDetailsView playerData={selectedPlayerData || selectedTeamCard} />
               ) : (
                 <>
-                  <TeamView stats={stats} socket={socket} onTeamCardSelect={(item) => setSelectedTeamCard(item)}/>
+                  <TeamView stats={stats} socket={socket} onTeamCardSelect={(item) => setSelectedTeamCard(item)} />
                   <TMButton
                     label="Play Now"
                     type={'success'}
@@ -115,7 +115,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                         gameState: {
                           availableCards: collection.playingCards
                         },
-                        clientInfo
+                        clientInfo: { ...clientInfo, teamCards: collection.playingCards }
                       });
                     }}
                   />
