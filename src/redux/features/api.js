@@ -4,6 +4,7 @@ import {getData} from './../reducers/utils'
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
+    // baseUrl: 'https://vijyo-trump-master.onrender.com/api/',
     baseUrl: 'http://192.168.29.168:8080/api/',
     prepareHeaders: async (headers) => {
       const token = await getData('token');

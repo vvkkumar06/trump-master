@@ -8,6 +8,8 @@ import { useFonts } from 'expo-font';
 import { io } from "socket.io-client";
 import TMMain from './src/views/TMMain';
 const socket = io("http://192.168.29.168:8080");
+// const socket = io("https://vijyo-trump-master.onrender.com");
+
 export default function App() {
 
   const [fontsLoaded] = useFonts({
