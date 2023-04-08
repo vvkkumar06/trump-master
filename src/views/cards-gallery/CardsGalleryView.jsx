@@ -11,23 +11,13 @@ import CardDetailsView from '../detail/CardDetailsView';
 import TeamView from '../team/TeamView';
 const coverColor = '#ccc';
 
-const CardsGalleryView = ({ stats, type, navigation }) => {
+const CardsGalleryView = ({stats, type, navigation }) => {
   const collection = useSelector(state => state.cricketCards.data);
   const socket = useContext(SocketContext);
   const [selectedCard, setSelectedCard] = useState(undefined);
   const [selectedTeamCard, setSelectedTeamCard] = useState(undefined);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    // socket.on("show-preload", (args, cb) => {
-    //   if (args) {
-    //     ToastAndroid.show(args.error, ToastAndroid.SHORT)
-    //   } else {
-    //     navigation.navigate('PreGameLoader');
-    //   }
-    // });
-  }, []);
 
   const galleryHeader = () => {
     return (

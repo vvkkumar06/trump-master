@@ -1,23 +1,27 @@
 import NavigationView from './navigation/NavigationView';
 import { StatusBar, View, ImageBackground } from 'react-native';
-import { useFetchUserQuery } from './../redux/features/api';
+import { useLazyFetchUserQuery } from './../redux/features/api';
 import { Text } from 'react-native-paper';
 import AnimatedLoader from "react-native-animated-loader";
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { updateCricketCards } from '../redux/features/cricket-slice';
 
-// Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function TMMain() {
-    const { isLoading } = useFetchUserQuery();
+    const [ fetchUser, { isLoading } ] = useLazyFetchUserQuery();
+    const dispatch = useDispatch();
 
     const [appIsReady, setAppIsReady] = useState(false);
 
     useEffect(() => {
         async function prepare() {
             try {
-                await new Promise(resolve => setTimeout(resolve, 20000));
+                console.log('fetching user');
+               const user = await fetchUser().unwrap();
+               dispatch(updateCricketCards(user.games && user.games.cricket))
             } catch (e) {
                 console.warn(e);
             } finally {

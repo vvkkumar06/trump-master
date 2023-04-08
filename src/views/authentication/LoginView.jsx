@@ -3,13 +3,16 @@ import { SafeAreaView, ImageBackground, View, Image } from 'react-native';
 import * as Google from 'expo-auth-session/providers/google';
 import { StyleSheet } from 'react-native';
 import { Button, Text } from 'react-native-paper'
-import { api, useFetchUserQuery, useLoginMutation } from '../../redux/features/api';
+import { api, useLoginMutation } from '../../redux/features/api';
 import { storeData } from '../../redux/reducers/utils';
 import AnimatedLoader from "react-native-animated-loader";
+import { useDispatch } from 'react-redux';
+import { updateCricketCards } from '../../redux/features/cricket-slice';
 
 const LoginView = () => {
   const  [fetchUser, userData] = api.endpoints.fetchUser.useLazyQuery();
   const userInfo =  userData.data;
+  const dispatch = useDispatch();
   const [Login, result] = useLoginMutation();
   const [showLoader, setShowLoader] = useState(false);
 
@@ -35,7 +38,8 @@ const LoginView = () => {
         if (jwtToken) {
           console.log('Saving token');
           await storeData('token', jwtToken)
-          fetchUser();
+          const user = await fetchUser().unwrap();
+          dispatch(updateCricketCards(user.games && user.games.cricket));
         }
       }
     }
