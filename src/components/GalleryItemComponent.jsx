@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 
 const GalleryItemComponent = ({
+  componentId,
   playerData,
   coverColor,
   pressHandler,
@@ -101,7 +102,7 @@ const GalleryItemComponent = ({
             setIsLongPressed(false);
           }}
         >
-          <Card key={playerData.TMID} style={{ ...styles.container, ...(isLongPressed && styles.longPress), ...(!canSelect && isLongPressed && styles.canSelect) }} >
+          <Card key={componentId} style={{ ...styles.container, ...(isLongPressed && styles.longPress), ...(!canSelect && isLongPressed && styles.canSelect) }} >
             <Card.Cover source={{ uri: playerData.Image }} style={{ ...styles.image, backgroundColor: coverColor }} resizeMode='contain' />
             <Text style={styles.name}>{name}</Text>
             <Text style={styles.id}>C#{playerData.TMID}</Text>

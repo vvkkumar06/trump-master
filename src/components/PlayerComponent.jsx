@@ -20,10 +20,8 @@ const getShortName = (name) => {
 };
 const getFontSize = (height, ref) => Math.floor((ref / 280) * height);
 
-const PlayerComponent = ({ displayProps, playerData, coverColor, topStyle, idStyle, height, textVariant = "labelSmall", imageStyle, useShortName }) => (
-
-
-  <Card elevated key={playerData.PlayerName} style={[styles.container]} >
+const PlayerComponent = ({ componentId, displayProps, playerData, coverColor, topStyle, idStyle, height, textVariant = "labelSmall", imageStyle, useShortName }) => (
+  <Card elevated key={componentId} style={[styles.container]} >
     <View style={[styles.topLeftBox, topStyle]} />
     <Image
       style={[styles.logo, imageStyle]}
@@ -35,7 +33,7 @@ const PlayerComponent = ({ displayProps, playerData, coverColor, topStyle, idSty
       textAlign: 'center', textTransform: 'uppercase', fontWeight: 'bold',
       backgroundColor: '#333', color: '#eee', fontStyle: 'italic',
       fontSize: getFontSize(height, 16),
-    }}>{!useShortName ? playerData.PlayerName : getShortName(playerData.PlayerName)}</Text>
+    }}>{!useShortName && playerData.PlayerName.length < 13 ? playerData.PlayerName : getShortName(playerData.PlayerName)}</Text>
     <View style={{
       justifyContent: 'space-between', flexDirection: 'row', 
       flexWrap: 'wrap', backgroundColor: '#eee', alignContent: 'space-between', 

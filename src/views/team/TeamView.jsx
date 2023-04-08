@@ -9,7 +9,6 @@ const coverColor = '#ccc';
 
 const TeamView = ({ stats, onTeamCardSelect }) => {
   const collection = useSelector(state => state.cricketCards.data);
-
   const dispatch = useDispatch();
   const rotateBorder = useRef(new Animated.Value(0)).current;
 
@@ -17,7 +16,7 @@ const TeamView = ({ stats, onTeamCardSelect }) => {
 
   const playingCards = useMemo(() => {
     return transformTeamToPlayingCards(collection && collection.playingCards, stats);
-  }, [collection])
+  }, [collection, stats]);
 
   const getGalleryItem = (item, key) => {
     return <GalleryItemComponent
