@@ -83,7 +83,7 @@ export default CardsShuffleComponent = forwardRef(({ width, height, margin, tota
               <Animated.View
                 key={i}
                 style={[
-                  { width, margin, height },
+                  { width, margin, height},
                   (customStyle ? customStyle : {}),
                   cardStyles[`x${i + 1}s`]
                 ]}>

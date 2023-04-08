@@ -30,6 +30,15 @@ export const api = createApi({
       query: () => 'user',
       providesTags: ['User']
     }),
+    updateCricketState: builder.mutation({
+      query: (body) => {
+        return {
+        url: `user/cricket`,
+        method: 'PUT',
+        body
+      }},
+      invalidatesTags: ['User'],
+    }),
     // Authentication
     login: builder.mutation({
       query: (body) => {
@@ -41,4 +50,4 @@ export const api = createApi({
     }),
   }),
 })
-export const { useFetchStatsQuery, useUpdateCricketCollectionMutation, useLoginMutation, useFetchUserQuery } = api;
+export const { useFetchStatsQuery, useUpdateCricketCollectionMutation, useLoginMutation, useFetchUserQuery, useUpdateCricketStateMutation, useLazyFetchUserQuery} = api;

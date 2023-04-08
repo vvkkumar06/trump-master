@@ -9,13 +9,10 @@ import { findVacantPlayer, transformCollectionToList } from '../../redux/reducer
 import SocketContext from '../../utils/SocketContext';
 import CardDetailsView from '../detail/CardDetailsView';
 import TeamView from '../team/TeamView';
-import { useFetchUserQuery } from '../../redux/features/api';
 const coverColor = '#ccc';
 
 const CardsGalleryView = ({ stats, type, navigation }) => {
   const collection = useSelector(state => state.cricketCards.data);
-  const { data: clientInfo } = useFetchUserQuery();
-
   const socket = useContext(SocketContext);
   const [selectedCard, setSelectedCard] = useState(undefined);
   const [selectedTeamCard, setSelectedTeamCard] = useState(undefined);
@@ -23,13 +20,13 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    socket.on("show-preload", (args, cb) => {
-      if (args) {
-        ToastAndroid.show(args.error, ToastAndroid.SHORT)
-      } else {
-        navigation.navigate('PreGameLoader');
-      }
-    });
+    // socket.on("show-preload", (args, cb) => {
+    //   if (args) {
+    //     ToastAndroid.show(args.error, ToastAndroid.SHORT)
+    //   } else {
+    //     navigation.navigate('PreGameLoader');
+    //   }
+    // });
   }, []);
 
   const galleryHeader = () => {
@@ -57,6 +54,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
         return (
           <>
             <GalleryItemComponent
+              componentId={index}
               playerData={item}
               coverColor={coverColor}
               pressHandler={(id) => setSelectedCard(id)}
@@ -69,7 +67,6 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
           </>
         )
       }}
-      keyExtractor={item => item.TMID}
     />
   }
   const selectedPlayerData = useMemo(() => {
@@ -111,12 +108,7 @@ const CardsGalleryView = ({ stats, type, navigation }) => {
                     disabled={canStartPlay}
                     labelStyle={styles.playNowLabel}
                     onPressHandler={() => {
-                      socket.emit('new-game', {
-                        gameState: {
-                          availableCards: collection.playingCards
-                        },
-                        clientInfo: { ...clientInfo, teamCards: collection.playingCards }
-                      });
+                      navigation.navigate('PreGameLoader');
                     }}
                   />
                 </>

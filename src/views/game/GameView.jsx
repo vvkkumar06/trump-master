@@ -131,16 +131,7 @@ const GameView = ({ route, navigation }) => {
       });
     });
 
-  }, [])
-
-  useEffect(() => {
-    if (winner && winner.length) {
-      // socket.emit('end-game');
-      // setTimeout(() => {
-      //   navigation.navigate('Dashboard');
-      // }, 5000)
-    }
-  }, [winner]);
+  }, []);
 
   useEffect(() => {
     if (nextRound) {
@@ -245,9 +236,10 @@ const GameView = ({ route, navigation }) => {
           <View style={styles.centerLine}>
             {!result && (
               <Animated.Text style={[styles.roundText, { color: 'yellow', fontSize: 36 }]}>
-                ROUND {nextRound}
+               {!lostPlayerCards ? `ROUND ${nextRound}` : "POST GAME"}
               </Animated.Text>
-            )}
+            )
+          }
           </View>
           <View style={styles.topRightLine} >
             <View style={{ width: 20, height: 20, marginRight: 20, marginLeft: 20, marginBottom: 35, alignItems: 'center' }}>
@@ -291,7 +283,7 @@ const GameView = ({ route, navigation }) => {
                 }
 
               </View>
-              <View style={{ display: 'flex', alignItems: 'center', width: 400 }}>
+              <View style={{ display: 'flex', alignItems: 'center', width: 400, justifyContent: 'center' }}>
                 {
                   winner ? (
                     <Animated.Text style={[
@@ -365,7 +357,7 @@ const GameView = ({ route, navigation }) => {
             </View>
           </> : (
             <View style={{width: '100%', flexDirection: 'row', justifyContent: 'center'}}>
-              <PostGame stats={stats} lostPlayerCards={lostPlayerCards} shuffleData={shuffleData} socket={socket} winner={winner}/>
+              <PostGame stats={stats} lostPlayerCards={lostPlayerCards} shuffleData={shuffleData} socket={socket} winner={winner} opponentId={opponentId} navigation={navigation}/>
             </View>
           )
         }

@@ -1,19 +1,53 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { BackHandler } from 'react-native';
-import { ImageBackground, SafeAreaView, StatusBar,Image, StyleSheet, View, Animated, Easing } from 'react-native';
+import { BackHandler, ToastAndroid } from 'react-native';
+import { ImageBackground, SafeAreaView, StatusBar, Image, StyleSheet, View, Animated, Easing } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
 import SocketContext from '../../../utils/SocketContext';
+import { useFetchUserQuery, useUpdateCricketStateMutation } from '../../../redux/features/api';
+import { useSelector } from 'react-redux';
 
 const PreGameLoaderView = ({ type, navigation }) => {
+  const { data: clientInfo } = useFetchUserQuery();
+  const [updateCricketState] = useUpdateCricketStateMutation();
+  const collection = useSelector(state => state.cricketCards.data);
   const socket = useContext(SocketContext);
   const [timer, setTimer] = useState(30);
   const [userDetails, setUserDetails] = useState([])
   const fontSize = useRef(new Animated.Value(15)).current;
   const colorOpacity = useRef(new Animated.Value(0.5)).current;
+
   useEffect(() => {
-    socket.on("load-game", (args, cb) => {
-      setUserDetails(args.players)
+    const updateGameState = () => {
+      return updateCricketState(collection);
+    }
+    updateGameState().then(() => {
+      socket.emit('new-game', {
+        gameState: {
+          availableCards: collection.playingCards
+        },
+        clientInfo: {
+          name: clientInfo.name,
+          id: clientInfo.id,
+          picture: clientInfo.picture,
+          teamCards: collection.playingCards
+        }
+
+      });
+      socket.on("load-game", (args, cb) => {
+        setUserDetails(args.players)
+      });
+    }).catch(() => {
+      console.log('Internet connection is not available:', error);
+    })
+    socket.on("show-preload", (args, cb) => {
+      if (args) {
+        ToastAndroid.show(args.error, ToastAndroid.SHORT);
+        setTimeout(() => {
+          navigation.navigate('Dashboard');
+        }, 1000)
+      }
     });
+   
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
     return () => {
       backHandler.remove();
@@ -94,15 +128,15 @@ const PreGameLoaderView = ({ type, navigation }) => {
             ) :
               (
                 <View style={{ flexDirection: 'row', width: 800 }}>
-                  <View style={{ width: 350, alignItems: 'center'}}>
-                    <Avatar.Image size={100} style={{ alignSelf: 'center'}} source={{uri: userDetails[1]['clientInfo'].picture}} />
-                    <Animated.Text variant='headlineSmall' style={[styles.user, {  fontSize, color: '#a2cf6e', opacity: colorOpacity }]}>{userDetails[1].clientInfo.name}</Animated.Text>
+                  <View style={{ width: 350, alignItems: 'center' }}>
+                    <Avatar.Image size={100} style={{ alignSelf: 'center' }} source={{ uri: userDetails[1]['clientInfo'].picture }} />
+                    <Animated.Text variant='headlineSmall' style={[styles.user, { fontSize, color: '#a2cf6e', opacity: colorOpacity }]}>{userDetails[1].clientInfo.name}</Animated.Text>
                   </View>
                   <View style={{ width: 100 }}>
                     <Text variant='displayLarge' style={styles.vs}>Vs</Text>
                   </View>
                   <View style={{ width: 350, alignItems: 'center' }}>
-                    <Avatar.Image size={100} style={{ alignSelf: 'center'}} source={{uri: userDetails[2]['clientInfo'].picture}} />
+                    <Avatar.Image size={100} style={{ alignSelf: 'center' }} source={{ uri: userDetails[2]['clientInfo'].picture }} />
                     <Animated.Text variant='headlineSmall' style={[styles.user, { fontSize, color: '#ff9800', opacity: colorOpacity }]}>{userDetails[2].clientInfo.name}</Animated.Text>
                   </View>
                 </View>

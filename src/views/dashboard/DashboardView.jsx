@@ -9,7 +9,6 @@ const DashboardView = ({navigation}) => {
   const { data: cricketStats } = useFetchStatsQuery();
   const { data: userData } = useFetchUserQuery()
   const dispatch = useDispatch();
-
   useEffect(() => {
     dispatch(updateCricketCards(userData.games && userData.games.cricket))
   }, [userData.games.cricket])

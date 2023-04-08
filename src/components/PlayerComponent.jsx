@@ -20,10 +20,8 @@ const getShortName = (name) => {
 };
 const getFontSize = (height, ref) => Math.floor((ref / 280) * height);
 
-const PlayerComponent = ({ displayProps, playerData, coverColor, topStyle, idStyle, height, textVariant = "labelSmall", imageStyle, useShortName }) => (
-
-
-  <Card elevated key={playerData.PlayerName} style={[styles.container]} >
+const PlayerComponent = ({ componentId, displayProps, playerData, coverColor, topStyle, idStyle, height, textVariant = "labelSmall", imageStyle, useShortName }) => (
+  <Card elevated key={componentId} style={[styles.container]} >
     <View style={[styles.topLeftBox, topStyle]} />
     <Image
       style={[styles.logo, imageStyle]}
