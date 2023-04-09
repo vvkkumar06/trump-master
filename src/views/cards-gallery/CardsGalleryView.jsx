@@ -9,6 +9,7 @@ import { findVacantPlayer, transformCollectionToList } from '../../redux/reducer
 import SocketContext from '../../utils/SocketContext';
 import CardDetailsView from '../detail/CardDetailsView';
 import TeamView from '../team/TeamView';
+import LoaderComponent from '../../components/LoaderComponent';
 const coverColor = '#ccc';
 
 const CardsGalleryView = ({stats, type, navigation }) => {
@@ -29,8 +30,7 @@ const CardsGalleryView = ({stats, type, navigation }) => {
 
   const listData = useMemo(() => {
     return transformCollectionToList(collection && collection.backupCards, stats);
-  }, [collection, stats])
-
+  }, [collection, stats]);
   const renderList = () => {
     const vacantPlayerId = collection && findVacantPlayer(collection.playingCards);
     return <FlatList
@@ -76,6 +76,7 @@ const CardsGalleryView = ({stats, type, navigation }) => {
       activeOpacity={1}
       style={styles.background}
     >
+      <LoaderComponent isLoading={!listData}/>
       <ImageBackground source={require('./../../../assets/background4.png')} resizeMode="cover" style={styles.background}>
         <SafeAreaView style={styles.container}>
           <View style={styles.galleryLeft}>

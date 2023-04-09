@@ -27,7 +27,7 @@ const TeamView = ({ stats, onTeamCardSelect }) => {
       longPressHandler={() => {
         containerRefs.current[`card${key}`].setNativeProps({
           style: {
-            zIndex: 999
+            zIndex: 999,
           }
         })
       }}

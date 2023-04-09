@@ -1,12 +1,11 @@
 import NavigationView from './navigation/NavigationView';
 import { StatusBar, View, ImageBackground } from 'react-native';
 import { useLazyFetchUserQuery } from './../redux/features/api';
-import { Text } from 'react-native-paper';
-import AnimatedLoader from "react-native-animated-loader";
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateCricketCards } from '../redux/features/cricket-slice';
+import LoaderComponent from '../components/LoaderComponent';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -19,7 +18,6 @@ export default function TMMain() {
     useEffect(() => {
         async function prepare() {
             try {
-                console.log('fetching user');
                const user = await fetchUser().unwrap();
                dispatch(updateCricketCards(user.games && user.games.cricket))
             } catch (e) {
@@ -44,19 +42,9 @@ export default function TMMain() {
 
     return (
         <View onLayout={onLayoutRootView}>
-            <ImageBackground source={require('./../../assets/background3.png')} resizeMode="cover" style={{ width: '100%', height: '100%' }} >
+            <ImageBackground source={require('./../../assets/background4.png')} resizeMode="cover" style={{ width: '100%', height: '100%' }} >
                 {
-                    isLoading ? <View style={{ justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}>
-                        <AnimatedLoader
-                            visible={true}
-                            overlayColor='transparent'
-                            source={require("./../assets/loaders/app.json")}
-                            animationStyle={{ width: 250, height: 250 }}
-                            speed={1}
-                        >
-                            <Text variant="headlineSmall">Loading...</Text>
-                        </AnimatedLoader>
-                    </View> : (
+                   isLoading ? <LoaderComponent isLoading={isLoading}/>  : (
                         <>
                             <StatusBar hidden />
                             <NavigationView />

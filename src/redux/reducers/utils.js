@@ -27,7 +27,7 @@ export const transformCollectionToList = (data, stats) => {
         list.push(stats.find(item => item.TMID == key));
       }
     });
-  return list;
+  return  !(data && stats) ? undefined : list
 }
 
 export const transformTeamToPlayingCards = (data, stats) => {

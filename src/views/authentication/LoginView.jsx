@@ -8,6 +8,7 @@ import { storeData } from '../../redux/reducers/utils';
 import AnimatedLoader from "react-native-animated-loader";
 import { useDispatch } from 'react-redux';
 import { updateCricketCards } from '../../redux/features/cricket-slice';
+import LoaderComponent from '../../components/LoaderComponent';
 
 const LoginView = () => {
   const  [fetchUser, userData] = api.endpoints.fetchUser.useLazyQuery();
@@ -47,7 +48,7 @@ const LoginView = () => {
   }, [result.data]);
 
   return (
-    <ImageBackground source={require('./../../../assets/background3.png')} resizeMode="cover" style={styles.background}>
+    <ImageBackground source={require('./../../../assets/background4.png')} resizeMode="cover" style={styles.background}>
       {
         (!userInfo || (userInfo.error))&& !showLoader ? <SafeAreaView style={styles.container}>
           <View style={styles.logoContainer}>
@@ -70,15 +71,7 @@ const LoginView = () => {
           > Login</Button>
         </SafeAreaView> :
           <View style={{ justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}>
-            <AnimatedLoader
-              visible={true}
-              overlayColor='transparent'
-              source={require("./../../assets/loaders/app.json")}
-              animationStyle={{ width: 250, height: 250 }}
-              speed={1}
-            >
-              <Text variant="headlineSmall">Loading...</Text>
-            </AnimatedLoader>
+            <LoaderComponent isLoading={true}/>
           </View>
       }
     </ImageBackground >
